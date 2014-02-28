@@ -26,6 +26,9 @@ $ nrm ls
 
 ```
 $ nrm use cnpm  //switch registry to cnpm
+
+    Registry has been set to: http://r.cnpmjs.org/
+
 ```
 
 ## cmd
