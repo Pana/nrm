@@ -187,3 +187,5 @@ function printVersion () {
     ];
     console.log(message.join('\n'));
 }
+
+module.exports = {};
