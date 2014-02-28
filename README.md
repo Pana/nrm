@@ -1,7 +1,7 @@
 nrm
 ===
 
-NPM registry manager. Fast switch between all NPM registries.
+NPM registry manager. Fast switch between all NPM registries: npm, eu, cnpm, au, sl(strongloop), nj(nodejitsu).
 
 
 ## Install
@@ -10,22 +10,18 @@ NPM registry manager. Fast switch between all NPM registries.
 $ npm install -g nrm
 ```
 
-## use
+## Use
 
 ```
-// show all registries
-nrm list
-
-// switch to cnpm 
-nrm use cnpm
-
-// go to home page
-nrm home
+nrm help       // show help
+nrm list       // show all registries
+nrm use cnpm   // switch to cnpm 
+nrm home       // go to home page
 
 ```
 
 
-## registries
+## Registries
 
 * NPM
 * cnpm
@@ -37,7 +33,6 @@ nrm home
 ## TODO
 
 * enable add registry
-* show all registry
 
 
 ## LICENSE
