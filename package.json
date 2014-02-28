@@ -4,9 +4,6 @@
   "description": "NPM registry manager",
   "main": "index.js",
   "bin": "./cli.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git://github.com/Pana/nrm.git"
