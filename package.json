@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "NPM registry manager",
   "main": "index.js",
-  "bin": "index.js",
+  "bin": "./cli.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
