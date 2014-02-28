@@ -1,0 +1,24 @@
+{
+  "name": "nrm",
+  "version": "0.1.0",
+  "description": "NPM registry manager",
+  "main": "index.js",
+  "bin": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Pana/nrm.git"
+  },
+  "keywords": [
+    "NPM",
+    "registry"
+  ],
+  "author": "Pana",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Pana/nrm/issues"
+  },
+  "homepage": "https://github.com/Pana/nrm",
+}

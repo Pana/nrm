@@ -1,0 +1,32 @@
+[
+    {
+        "name": "npm",
+        "home": "https://www.npmjs.org",
+        "registry": "https://registry.npmjs.org/"
+    },
+    {
+        "name": "cnpm",
+        "home": "http://cnpmjs.org",
+        "registry": "http://r.cnpmjs.org/"
+    },
+    {
+        "name": "eu",
+        "home": "http://npmjs.eu",
+        "registry": "http://registry.npmjs.eu/"
+    },
+    {
+        "name": "au",
+        "home": "http://npmjs.org.au",
+        "registry": "http://registry.npmjs.org.au/"
+    },
+    {
+        "name": "sl",
+        "home": "http://strongloop.com",
+        "registry": "http://npm.strongloop.com/"
+    },
+    {
+        "name": "nj",
+        "home": "https://www.nodejitsu.com",
+        "registry": "https://registry.nodejitsu.com/"
+    }
+]
