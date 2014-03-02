@@ -1,7 +1,8 @@
 {
   "name": "nrm",
   "version": "0.1.0",
-  "description": "NPM registry manager",
+  "description": "NPM registry manager can help you easy and fast switch between
+  different npm registries, now include: snpm, cnpm, eu,  au, sl(strongloop), nj(nodejitsu)",
   "main": "index.js",
   "bin": "./cli.js",
   "repository": {
