@@ -58,7 +58,8 @@ function run (cmd, args, cbk) {
 * get current registry
 */
 function getRegistry (cbk) {
-    run('npm', ['config', 'get', 'registry'], cbk);
+    var npm = process.platform === "win32" ? "npm.cmd" : "npm";
+    run(npm, ['config', 'get', 'registry'], cbk);
 }
 
 /*
