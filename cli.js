@@ -2,7 +2,7 @@
 var spawn = require('child_process').spawn;
 var registries = require('./registries.json');
 var version = require('./package.json').version;
-
+var eol = require('os').EOL;
 
 if(!module.parent) {
     var args = process.argv.slice(2);
@@ -10,14 +10,10 @@ if(!module.parent) {
     var arg = args[1];
     switch (cmd) {
         case 'ls':
-            printRegistries();
-            break;
         case 'list':
             printRegistries();
             break;
         case 'v':
-            printVersion();
-            break;            
         case 'version':
             printVersion();
             break;
@@ -66,7 +62,8 @@ function getRegistry (cbk) {
 * set registry
 */
 function setRegistry (registry, cbk) {
-    run('npm', ['config', 'set', 'registry', registry], cbk);
+    var npm = process.platform === "win32" ? "npm.cmd" : "npm";
+    run(npm, ['config', 'set', 'registry', registry], cbk);
 }
 
 /*
@@ -79,14 +76,14 @@ function printRegistries () {
         registry = registry.replace(/\n/g, '');
 
         var info = [];
-        info.push('\n');
+        info.push('');
         registries.forEach(function (item) {
             var cur = item.registry === registry;
             var curP = cur ? "* " : "  ";
             info.push(curP + item.name + line(item.name, 8) + item.registry);
         });
-        info.push('\n');
-        console.log(info.join('\n'));
+        info.push('');
+        printMessage(info);
     });
 }
 
@@ -135,26 +132,21 @@ function useRegistry (registry) {
             printErr(err);
         else{
             var message = [
-                "\n",
+                "",
                 '    Registry has been set to: ' + r,
-                "\n"
+                ""
             ];
-            console.log(message.join('\n'));
+            printMessage(message);
         }
     });
 }
-
-/*
-* empty function
-*/
-function empty () {}
 
 /*
 * goto registry home
 */
 function openHome (registry) {
     var r = _findRegistry(registry);
-    run('open', [r.home], empty);
+    run('open', [r.home]);
 }
 
 /*
@@ -162,19 +154,19 @@ function openHome (registry) {
 */
 function help () {
     var message = [
-        "\n",
+        "",
         "Usage: nrm cmd [arg]",
-        "\n",
+        "",
         "Options:",
-        "\n",
+        "",
         "  ls, list        list all the registries, with * is using now",
         "  use registry    change registry to registry",
         "  home registry   open registry home page",
         "  v, version      output current version",
         "  h, help         output help message",
-        "\n"
+        ""
     ]
-    console.log(message.join('\n'));
+    printMessage(message);
 }
 
 /*
@@ -182,9 +174,18 @@ function help () {
 */
 function printVersion () {
     var message = [
-        "\n",
+        "",
         '    Current version: ' + version,
-        "\n"
+        ""
     ];
-    console.log(message.join('\n'));
+    printMessage(message);
+}
+
+/*
+* print message
+*/
+function printMessage (msg) {
+    msg.forEach(function (i) {
+        console.log(i);
+    });
 }
