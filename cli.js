@@ -2,7 +2,7 @@
 var spawn = require('child_process').spawn;
 var registries = require('./registries.json');
 var version = require('./package.json').version;
-var eol = require('os').EOL;
+var NPM = process.platform === "win32" ? "npm.cmd" : "npm";
 
 if(!module.parent) {
     var args = process.argv.slice(2);
@@ -54,16 +54,14 @@ function run (cmd, args, cbk) {
 * get current registry
 */
 function getRegistry (cbk) {
-    var npm = process.platform === "win32" ? "npm.cmd" : "npm";
-    run(npm, ['config', 'get', 'registry'], cbk);
+    run(NPM, ['config', 'get', 'registry'], cbk);
 }
 
 /*
 * set registry
 */
 function setRegistry (registry, cbk) {
-    var npm = process.platform === "win32" ? "npm.cmd" : "npm";
-    run(npm, ['config', 'set', 'registry', registry], cbk);
+    run(NPM, ['config', 'set', 'registry', registry], cbk);
 }
 
 /*
@@ -112,6 +110,14 @@ function _findRegistry (registry) {
         if (r.name === registry || r.registry === registry)
             return r
     }
+    // not find registry, print message
+    var message = [
+        "",
+        '   Not find registry: ' + registry,
+        ""
+    ];
+    printMessage(message);
+    process.exit();
 }
 
 function findRegistry (registry) {
