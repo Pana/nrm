@@ -3,12 +3,15 @@ var spawn = require('child_process').spawn;
 var registries = require('./registries.json');
 var version = require('./package.json').version;
 var eol = require('os').EOL;
-var http = require('http')
+var http = require('http');
+var fs = require('fs');
 
 if(!module.parent) {
     var args = process.argv.slice(2);
     var cmd = args[0];
     var arg = args[1];
+	var ar2 = args[2];
+	var ar3 = args[3];
     switch (cmd) {
         case 'ls':
         case 'list':
@@ -24,6 +27,14 @@ if(!module.parent) {
         case 'home':
             openHome(arg);
             break;
+		case 'add':
+			if (ar3 == undefined){
+				addRegistry(arg, ar2)		
+			}
+			else {
+				addRegistry(arg, ar2, ar3);
+			}
+			break;
 		case 'time':
 			caculateTime();
 			break;
@@ -219,4 +230,19 @@ function caculateTime(){
 /*
 * add registry
 */
-//function 
+function addRegistry(arg, arg2){
+	registries.push({
+		'name':arg, 
+		'home':'', 
+		'registry':arg2
+		});
+	console.log(registries);
+	fs.open('./package.json', 'w', 0644, function(e, fd){
+		fs.writeFile('./package.json', JSON.stringify(registries), function(e){
+			if (e) throw e;
+			fs.closeSync(fd);
+			console.log("Successfully add ", arg, " ", arg2);
+		});
+	});
+
+}
