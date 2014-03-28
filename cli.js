@@ -3,6 +3,7 @@ var spawn = require('child_process').spawn;
 var registries = require('./registries.json');
 var version = require('./package.json').version;
 var eol = require('os').EOL;
+var http = require('http')
 
 if(!module.parent) {
     var args = process.argv.slice(2);
@@ -23,6 +24,9 @@ if(!module.parent) {
         case 'home':
             openHome(arg);
             break;
+		case 'time':
+			caculateTime();
+			break;
         case 'h':
         case 'help':
         case undefined:
@@ -189,3 +193,30 @@ function printMessage (msg) {
         console.log(i);
     });
 }
+
+/*
+* time
+*/
+function caculateTime(){
+//	var start = new Date().getTime();
+	for (var i in registries) {
+		var start = new Date().getTime()
+		url = registries[i].registry
+		http.get({host: url}, function(res){
+			clearTimeout(request_timer);
+			if (res.status === 200) {
+				console.log('Took:', new Date().getTime() - start, '\t',url );
+			}
+			else {
+				console.log('Timeout');
+			}
+		});
+	}
+	
+}
+
+
+/*
+* add registry
+*/
+//function 
