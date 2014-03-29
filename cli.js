@@ -35,9 +35,12 @@ if(!module.parent) {
                 addRegistry(arg, ar2, ar3);
             }
             break;
-        case 'time':
-            caculateTime();
+        case 'del':
+            delRegistry(arg);
             break;
+        /*case 'time':
+            caculateTime();
+            break;*/
         case 'h':
         case 'help':
         case undefined:
@@ -183,11 +186,12 @@ function help () {
         "",
         "  ls, list        list all the registries, with * is using now",
         "  use registry    change registry to registry",
-        "  home registry   open registry home page",
+        "  home x registry open registry home page with x(x is you brower or other)",
         "  v, version      output current version",
         "  h, help         output help message",
         "  add name (home) registry",
         "                  add registry (name and registry is essential) ",
+        "  del name        delete registry",
         ""
     ]
     printMessage(message);
@@ -226,5 +230,22 @@ function addRegistry(arg1, arg2, arg3){
     fs.writeFile('./registries.json', JSON.stringify(registries, null, '\t'), function(e){
         if (e) throw e;
         console.log("Successfully add ", arg, " ", ar2);
+    });
+}
+
+/*
+* del registry
+*/
+function delRegistry(arg){
+    for (var i=0; i < registries.length; i++){
+        item = registries[i];
+        if (item.name == arg){
+            if(registries.splice(i,1)){
+                console.log("Successfully delete " + item.name);
+            }
+        }
+    };
+    fs.writeFile('./registries.json', JSON.stringify(registries, null, '\t'), function(e){
+        if (e) throw e;
     });
 }

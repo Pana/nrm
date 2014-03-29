@@ -28,25 +28,5 @@
 		"name": "nj",
 		"home": "https://www.nodejitsu.com",
 		"registry": "https://registry.nodejitsu.com/"
-	},
-	{
-		"name": "test1",
-		"home": "",
-		"registry": "http://test1"
-	},
-	{
-		"name": "test2",
-		"home": "",
-		"registry": "http://test2"
-	},
-	{
-		"name": "test3",
-		"home": "test3",
-		"registry": "test3"
-	},
-	{
-		"name": "test4",
-		"home": "",
-		"registry": "test4"
 	}
 ]
