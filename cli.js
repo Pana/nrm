@@ -29,7 +29,7 @@ if(!module.parent) {
             break;
 		case 'add':
 			if (ar3 == undefined){
-				addRegistry(arg, ar2)		
+				addRegistry(arg, ar2);		
 			}
 			else {
 				addRegistry(arg, ar2, ar3);
@@ -223,26 +223,21 @@ function caculateTime(){
 			}
 		});
 	}
-	
 }
 
 
 /*
 * add registry
 */
-function addRegistry(arg, arg2){
+function addRegistry(arg, ar2){
 	registries.push({
 		'name':arg, 
 		'home':'', 
-		'registry':arg2
+		'registry':ar2
 		});
-	console.log(registries);
-	fs.open('./package.json', 'w', 0644, function(e, fd){
-		fs.writeFile('./package.json', JSON.stringify(registries), function(e){
-			if (e) throw e;
-			fs.closeSync(fd);
-			console.log("Successfully add ", arg, " ", arg2);
-		});
+	fs.writeFile('./registries.json', JSON.stringify(registries, null, '\t'), function(e){
+		if (e) throw e;
+		//fs.closeSync(fd);
+		console.log("Successfully add ", arg, " ", ar2);
 	});
-
 }
