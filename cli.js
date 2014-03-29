@@ -1,17 +1,17 @@
 #!/usr/bin/env node
-var spawn = require('child_process').spawn;
-var registries = require('./registries.json');
-var version = require('./package.json').version;
-var eol = require('os').EOL;
-var http = require('http');
-var fs = require('fs');
+var spawn       = require('child_process').spawn;
+    registries  = require('./registries.json');
+    version     = require('./package.json').version;
+    eol         = require('os').EOL;
+    http        = require('http');
+    fs          = require('fs');
 
 if(!module.parent) {
-    var args = process.argv.slice(2);
-    var cmd = args[0];
-    var arg = args[1];
-	var ar2 = args[2];
-	var ar3 = args[3];
+    var args    = process.argv.slice(2);
+        cmd     = args[0];
+        arg     = args[1];
+        ar2     = args[2];
+        ar3     = args[3];
     switch (cmd) {
         case 'ls':
         case 'list':
@@ -25,19 +25,19 @@ if(!module.parent) {
             useRegistry(arg);
             break;
         case 'home':
-            openHome(arg);
+            openHome(arg, ar2);
             break;
-		case 'add':
-			if (ar3 == undefined){
-				addRegistry(arg, ar2);		
-			}
-			else {
-				addRegistry(arg, ar2, ar3);
-			}
-			break;
-		case 'time':
-			caculateTime();
-			break;
+        case 'add':
+            if (ar3 == undefined){
+                addRegistry(arg, '', ar2);      
+            }
+            else {
+                addRegistry(arg, ar2, ar3);
+            }
+            break;
+        case 'time':
+            caculateTime();
+            break;
         case 'h':
         case 'help':
         case undefined:
@@ -60,9 +60,16 @@ function run (cmd, args, cbk) {
     ls.stderr.on('data', function (tmp) {
         err += tmp;
     });
+    if ("npm" == process.platform === "win32" ? "npm.cmd" : "npm"){
+        ls.on('exit', function (code) {
+        cbk && cbk(err, data);
+        });
+    }
+    /*
     ls.on('close', function (code) {
         cbk && cbk(err, data);
     });
+    */
 }
 
 /*
@@ -86,15 +93,15 @@ function setRegistry (registry, cbk) {
 */
 function printRegistries () {
     getRegistry(function (err, registry) {
-        if(err) return pringErr(err);
+        if(err) return printErr(err);
         // replace \n
         registry = registry.replace(/\n/g, '');
 
         var info = [];
         info.push('');
         registries.forEach(function (item) {
-            var cur = item.registry === registry;
-            var curP = cur ? "* " : "  ";
+            var cur = item.registry ;
+            var curP = cur === registry ? "* " : "  ";
             info.push(curP + item.name + line(item.name, 8) + item.registry);
         });
         info.push('');
@@ -139,7 +146,7 @@ function findRegistry (registry) {
 */
 function useRegistry (registry) {
     var r = findRegistry(registry);
-    if(!r && /http/.test(registry))
+    if(!r && /http/.test(registry) || /https/.test(registry) )
         r = registry;
 
     setRegistry(r, function (err, result) {
@@ -159,9 +166,9 @@ function useRegistry (registry) {
 /*
 * goto registry home
 */
-function openHome (registry) {
+function openHome (soft, registry) {
     var r = _findRegistry(registry);
-    run('open', [r.home]);
+    run(soft, [r.home]);
 }
 
 /*
@@ -179,6 +186,8 @@ function help () {
         "  home registry   open registry home page",
         "  v, version      output current version",
         "  h, help         output help message",
+        "  add name (home) registry",
+        "                  add registry (name and registry is essential) ",
         ""
     ]
     printMessage(message);
@@ -209,35 +218,34 @@ function printMessage (msg) {
 * time
 */
 function caculateTime(){
-//	var start = new Date().getTime();
-	for (var i in registries) {
-		var start = new Date().getTime()
-		url = registries[i].registry
-		http.get({host: url}, function(res){
-			clearTimeout(request_timer);
-			if (res.status === 200) {
-				console.log('Took:', new Date().getTime() - start, '\t',url );
-			}
-			else {
-				console.log('Timeout');
-			}
-		});
-	}
+//  var start = new Date().getTime();
+    for (var i in registries) {
+        var start = new Date().getTime()
+        url = registries[i].registry
+        http.get({host: url}, function(res){
+            clearTimeout(request_timer);
+            if (res.status === 200) {
+                console.log('Took:', new Date().getTime() - start, '\t',url );
+            }
+            else {
+                console.log('Timeout');
+            }
+        });
+    }
 }
 
 
 /*
 * add registry
 */
-function addRegistry(arg, ar2){
-	registries.push({
-		'name':arg, 
-		'home':'', 
-		'registry':ar2
-		});
-	fs.writeFile('./registries.json', JSON.stringify(registries, null, '\t'), function(e){
-		if (e) throw e;
-		//fs.closeSync(fd);
-		console.log("Successfully add ", arg, " ", ar2);
-	});
+function addRegistry(arg1, arg2, arg3){
+    registries.push({
+        'name':arg1, 
+        'home':arg2, 
+        'registry':arg3
+        });
+    fs.writeFile('./registries.json', JSON.stringify(registries, null, '\t'), function(e){
+        if (e) throw e;
+        console.log("Successfully add ", arg, " ", ar2);
+    });
 }
