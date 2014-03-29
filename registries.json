@@ -1,32 +1,52 @@
 [
-    {
-        "name": "npm",
-        "home": "https://www.npmjs.org",
-        "registry": "https://registry.npmjs.org/"
-    },
-    {
-        "name": "cnpm",
-        "home": "http://cnpmjs.org",
-        "registry": "http://r.cnpmjs.org/"
-    },
-    {
-        "name": "eu",
-        "home": "http://npmjs.eu",
-        "registry": "http://registry.npmjs.eu/"
-    },
-    {
-        "name": "au",
-        "home": "http://npmjs.org.au",
-        "registry": "http://registry.npmjs.org.au/"
-    },
-    {
-        "name": "sl",
-        "home": "http://strongloop.com",
-        "registry": "http://npm.strongloop.com/"
-    },
-    {
-        "name": "nj",
-        "home": "https://www.nodejitsu.com",
-        "registry": "https://registry.nodejitsu.com/"
-    }
+	{
+		"name": "npm",
+		"home": "https://www.npmjs.org",
+		"registry": "https://registry.npmjs.org/"
+	},
+	{
+		"name": "cnpm",
+		"home": "http://cnpmjs.org",
+		"registry": "http://r.cnpmjs.org/"
+	},
+	{
+		"name": "eu",
+		"home": "http://npmjs.eu",
+		"registry": "http://registry.npmjs.eu/"
+	},
+	{
+		"name": "au",
+		"home": "http://npmjs.org.au",
+		"registry": "http://registry.npmjs.org.au/"
+	},
+	{
+		"name": "sl",
+		"home": "http://strongloop.com",
+		"registry": "http://npm.strongloop.com/"
+	},
+	{
+		"name": "nj",
+		"home": "https://www.nodejitsu.com",
+		"registry": "https://registry.nodejitsu.com/"
+	},
+	{
+		"name": "test1",
+		"home": "",
+		"registry": "http://test1"
+	},
+	{
+		"name": "test2",
+		"home": "",
+		"registry": "http://test2"
+	},
+	{
+		"name": "test3",
+		"home": "test3",
+		"registry": "test3"
+	},
+	{
+		"name": "test4",
+		"home": "",
+		"registry": "test4"
+	}
 ]
