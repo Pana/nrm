@@ -215,27 +215,6 @@ function printMessage (msg) {
 }
 
 /*
-* time
-*/
-function caculateTime(){
-//  var start = new Date().getTime();
-    for (var i in registries) {
-        var start = new Date().getTime()
-        url = registries[i].registry
-        http.get({host: url}, function(res){
-            clearTimeout(request_timer);
-            if (res.status === 200) {
-                console.log('Took:', new Date().getTime() - start, '\t',url );
-            }
-            else {
-                console.log('Timeout');
-            }
-        });
-    }
-}
-
-
-/*
 * add registry
 */
 function addRegistry(arg1, arg2, arg3){
