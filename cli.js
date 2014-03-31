@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 var spawn       = require('child_process').spawn;
-    registries  = require('./registries.json');
-    version     = require('./package.json').version;
-    eol         = require('os').EOL;
-    http        = require('http');
-    fs          = require('fs');
+var registries  = require('./registries.json');
+var version     = require('./package.json').version;
+var fs          = require('fs');
+var NPM         = process.platform === "win32" ? "npm.cmd" : "npm";
 
-if(!module.parent) {
+if (!module.parent) {
     var args    = process.argv.slice(2);
         cmd     = args[0];
         arg     = args[1];
@@ -25,22 +24,14 @@ if(!module.parent) {
             useRegistry(arg);
             break;
         case 'home':
-            openHome(arg, ar2);
+            openHome(arg);
             break;
         case 'add':
-            if (ar3 == undefined){
-                addRegistry(arg, '', ar2);      
-            }
-            else {
-                addRegistry(arg, ar2, ar3);
-            }
+            addRegistry(arg, ar2, ar3);
             break;
         case 'del':
             delRegistry(arg);
             break;
-        /*case 'time':
-            caculateTime();
-            break;*/
         case 'h':
         case 'help':
         case undefined:
@@ -63,16 +54,9 @@ function run (cmd, args, cbk) {
     ls.stderr.on('data', function (tmp) {
         err += tmp;
     });
-    if ("npm" == process.platform === "win32" ? "npm.cmd" : "npm"){
-        ls.on('exit', function (code) {
-        cbk && cbk(err, data);
-        });
-    }
-    /*
     ls.on('close', function (code) {
         cbk && cbk(err, data);
     });
-    */
 }
 
 /*
@@ -135,7 +119,7 @@ function _findRegistry (registry) {
         if (r.name === registry || r.registry === registry)
             return r
     }
-    // not find registry, print message
+    // not find registry, print message and exit
     var message = [
         "",
         '   Not find registry: ' + registry,
@@ -155,7 +139,7 @@ function findRegistry (registry) {
 */
 function useRegistry (registry) {
     var r = findRegistry(registry);
-    if(!r && /http/.test(registry) || /https/.test(registry) )
+    if(!r && /http/.test(registry))
         r = registry;
 
     setRegistry(r, function (err, result) {
@@ -175,9 +159,9 @@ function useRegistry (registry) {
 /*
 * goto registry home
 */
-function openHome (soft, registry) {
+function openHome (registry) {
     var r = _findRegistry(registry);
-    run(soft, [r.home]);
+    run('open', [r.home]);
 }
 
 /*
@@ -190,14 +174,14 @@ function help () {
         "",
         "Options:",
         "",
-        "  ls, list        list all the registries, with * is using now",
-        "  use registry    change registry to registry",
-        "  home x registry open registry home page with x(x is you brower or other)",
-        "  v, version      output current version",
-        "  h, help         output help message",
-        "  add name (home) registry",
-        "                  add registry (name and registry is essential) ",
-        "  del name        delete registry",
+        "  ls, list          list all the registries, with * is using now",
+        "  use registry      change registry to registry",
+        "  home x registry   open registry home page with x (x is you brower or other)",
+        "  v, version        output current version",
+        "  h, help           output help message",
+        "  del name          delete registry",
+        "  add name registry (home)",
+        "                    add registry (home is optional) ",
         ""
     ]
     printMessage(message);
@@ -227,12 +211,12 @@ function printMessage (msg) {
 /*
 * add registry
 */
-function addRegistry(arg1, arg2, arg3){
+function addRegistry(name, registry, home){
     registries.push({
-        'name':arg1, 
-        'home':arg2, 
-        'registry':arg3
-        });
+        'name': name, 
+        'registry': registry,
+        'home': home
+    });
     fs.writeFile('./registries.json', JSON.stringify(registries, null, '\t'), function(e){
         if (e) throw e;
         console.log("Successfully add ", arg, " ", ar2);
@@ -243,10 +227,10 @@ function addRegistry(arg1, arg2, arg3){
 * del registry
 */
 function delRegistry(arg){
-    for (var i=0; i < registries.length; i++){
+    for (var i = 0; i < registries.length; i++) {
         item = registries[i];
-        if (item.name == arg){
-            if(registries.splice(i,1)){
+        if (item.name == arg && i > 5){
+            if (registries.splice(i, 1)) {
                 console.log("Successfully delete " + item.name);
             }
         }

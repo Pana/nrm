@@ -38,6 +38,8 @@ nrm help       // show help
 nrm list       // show all registries
 nrm use cnpm   // switch to cnpm
 nrm home       // go to a registry home page
+nrm add        // add registry
+nrm del        // remove registry
 
 ```
 
