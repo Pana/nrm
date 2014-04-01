@@ -10,6 +10,11 @@
 		"registry": "http://r.cnpmjs.org/"
 	},
 	{
+		"name": "rednode",
+		"home": "https://r.rednode.cn:5984",
+		"registry": "https://rednode.cn/"
+	},
+	{
 		"name": "eu",
 		"home": "http://npmjs.eu",
 		"registry": "http://registry.npmjs.eu/"
