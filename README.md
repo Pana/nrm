@@ -40,7 +40,7 @@ nrm use cnpm   // switch to cnpm
 nrm home       // go to a registry home page
 nrm add        // add registry
 nrm del        // remove registry
-
+nrm test       // test the registries
 ```
 
 
