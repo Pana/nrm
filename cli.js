@@ -4,13 +4,14 @@ var registries  = require('./registries.json');
 var version     = require('./package.json').version;
 var fs          = require('fs');
 var NPM         = process.platform === "win32" ? "npm.cmd" : "npm";
+var http        = require('http');
 
 if (!module.parent) {
     var args    = process.argv.slice(2);
-        cmd     = args[0];
-        arg     = args[1];
-        ar2     = args[2];
-        ar3     = args[3];
+    var cmd     = args[0];
+    var arg     = args[1];
+    var ar2     = args[2];
+    var ar3     = args[3];
     switch (cmd) {
         case 'ls':
         case 'list':
@@ -31,6 +32,9 @@ if (!module.parent) {
             break;
         case 'del':
             delRegistry(arg);
+            break;
+        case 'test':
+            getTimes(httpGetFunc, arg, ar2);
             break;
         case 'h':
         case 'help':
@@ -182,6 +186,8 @@ function help () {
         "  del name          delete registry",
         "  add name registry (home)",
         "                    add registry (home is optional) ",
+        "  test time (name)  get the time of visiting registry (name is optional)",
+        "                    eg.  test 1000 au  (the unit of time is ms) ",
         ""
     ]
     printMessage(message);
@@ -238,4 +244,80 @@ function delRegistry(arg){
     fs.writeFile('./registries.json', JSON.stringify(registries, null, '\t'), function(e){
         if (e) throw e;
     });
+}
+
+/*
+* The function of http get
+*/
+function httpGetFunc(name, options, timeout, cbk) {
+    var req_time    = null, req = null;
+    req_time        = setTimeout(function() {
+        req.destroy();
+    }, timeout);
+
+    req = http.get(options, function() {
+        clearTimeout(req_time);
+    });
+    req.on('response', function() {
+        req.destroy();
+        cbk();
+    });
+    req.on('error', function(e) {
+        if(req_time) {
+            clearTimeout(req_time);
+            console.log(name, '\t:', options['host']);
+            console.log('Timeout, error : ', e);
+        }
+    });
+}
+
+/*
+* get the test time
+*/
+function getTimes(httpGetFunc, basetime, registry) {
+    options = {
+        host : '',
+        port : '80',
+        path : '/'
+    }
+    if (registry != null) {
+        var regis   = findRegistry(registry);
+        var start   = new Date().getTime();
+        var pagenum = regis.match(/\:\/\/(.*)[\:]{0,1}([0-9]*)\//)[1];
+        cutUrl = pagenum.split(":");
+        if (cutUrl.length === 1) {
+            options['host'] = cutUrl[0];
+        }
+        else {
+            options['host'] = cutUrl[0];
+            options['port'] = cutUrl[1];
+        }
+        httpGetFunc(registry, options, Number(basetime), function() {
+            console.log('\t', registry, ' : ', new Date().getTime() - start, 'ms');
+        });
+    }
+    else {
+        registries.forEach(function(item) {
+            options = {
+                host : '',
+                port : '80',
+                path : '/'
+            }
+            var registry    = item.registry;
+            var start       = new Date().getTime();
+            var pagenum     = registry.match(/\:\/\/(.*)\//)[1];
+            cutUrl = pagenum.split(":");
+            if (cutUrl.length === 1) {
+                options['host'] = cutUrl[0];
+                options['port'] = 80;
+            }
+            else {
+                options['host'] = cutUrl[0];
+                options['port'] = cutUrl[1];
+            }
+            httpGetFunc(item.name, options, Number(basetime), function() {
+                console.log('\t', item.name, '\t: ', new Date().getTime() - start, 'ms');
+            });
+        });
+    }
 }
