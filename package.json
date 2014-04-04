@@ -7,6 +7,9 @@
     "type": "git",
     "url": "git://github.com/Pana/nrm.git"
   },
+  "scripts": {
+    "npm star starme"
+  },
   "keywords": [
     "NPM",
     "registry"
