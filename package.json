@@ -1,6 +1,6 @@
 {
   "name": "nrm",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "NPM registry manager can help you easy and fast switch between different npm registries, now include: snpm, cnpm, eu,  au, sl(strongloop), nj(nodejitsu)",
   "bin": "./cli.js",
   "repository": {
@@ -8,7 +8,7 @@
     "url": "git://github.com/Pana/nrm.git"
   },
   "scripts": {
-    "npm star starme"
+    "star": "npm star nrm"
   },
   "keywords": [
     "NPM",
