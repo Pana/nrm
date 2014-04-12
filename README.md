@@ -31,19 +31,24 @@ $ nrm use cnpm  //switch registry to cnpm
 
 ```
 
-## cmd
+## Usage
 
 ```
-nrm help       // show help
-nrm list       // show all registries
-nrm use cnpm   // switch to cnpm
-nrm home       // go to a registry home page
-nrm add        // add registry
-nrm del        // remove registry
+Usage: nrm [options] [command]
 
+  Commands:
+
+    ls                     list all the registries
+    use <registry>         change registry to registry
+    add <registry> <url> [home] add one custom registry
+    del <registry>         delete one custom registry
+    help                   print this help
+
+  Options:
+
+    -h, --help     output usage information
+    -V, --version  output the version number
 ```
-
-
 
 ## Registries
 
@@ -53,12 +58,6 @@ nrm del        // remove registry
 * [european](http://npmjs.eu)
 * [australia](http://npmjs.org.au)
 * [nodejitsu](https://www.nodejitsu.com)
-
-## TODO
-
-* enable registry adding
-* add more registries
-
 
 ## LICENSE
 MIT
