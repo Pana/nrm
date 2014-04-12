@@ -10,6 +10,7 @@ var path = require('path')
     , ini = require('ini')
     , echo = require('node-echo')
     , extend = require('extend')
+    , open = require('open')
 
     // locals
     , registries = require('./registries.json')
@@ -38,6 +39,11 @@ program
     .command('del <registry>')
     .description('delete one custom registry')
     .action(onDel);
+
+program
+    .command('home <registry> [brower]')
+    .description('open the homepage of registry with optional brower')
+    .action(onHome);
 
 program
     .command('help')
@@ -147,6 +153,22 @@ function onAdd(name, url, home){
             , ''
         ]);
     });
+}
+
+function onHome(name, brower){
+    var allRegistries = getAllRegistry();
+    if(!allRegistries.hasOwnProperty(name)){
+        return;
+    }
+    var registry = allRegistries[name];
+    if(!registry.hasOwnProperty('home')){
+        return;
+    }
+    var args = [registry.home];
+    if(brower){
+        args.push(brower);
+    }
+    open.apply(null, args);
 }
 
 function getCustomRegistry(){
