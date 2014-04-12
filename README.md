@@ -1,8 +1,8 @@
-nrm
+nrm(1) -- npm registry manager
 ===
 
-`nrm` is short for `npm registry manager`. can help you easy and fast switch between
-different npm registries, now include: `npm`, `cnpm`, `eu`,  `au`, `sl(strongloop)`, `nj(nodejitsu)`.
+`nrm` can help you easy and fast switch between different npm registries,
+now include: `npm`, `cnpm`, `eu`,  `au`, `sl(strongloop)`, `nj(nodejitsu)`.
 
 Recently npm has some problem frequently, `nrm` will be helpful to all noders.
 
