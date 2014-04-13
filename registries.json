@@ -1,37 +1,30 @@
-[
-	{
-		"name": "npm",
+{
+	"npm": {
 		"home": "https://www.npmjs.org",
 		"registry": "https://registry.npmjs.org/"
 	},
-	{
-		"name": "cnpm",
+	"cnpm": {
 		"home": "http://cnpmjs.org",
 		"registry": "http://r.cnpmjs.org/"
 	},
-	{
-		"name": "rnode",
+	"rnode": {
 		"home": "http://rednode.cn/",
 		"registry": "http://r.rednode.cn:5984/"
 	},
-	{
-		"name": "eu",
+	"eu": {
 		"home": "http://npmjs.eu",
 		"registry": "http://registry.npmjs.eu/"
 	},
-	{
-		"name": "au",
+	"au": {
 		"home": "http://npmjs.org.au",
 		"registry": "http://registry.npmjs.org.au/"
 	},
-	{
-		"name": "sl",
+	"sl": {
 		"home": "http://strongloop.com",
 		"registry": "http://npm.strongloop.com/"
 	},
-	{
-		"name": "nj",
+	"nj": {
 		"home": "https://www.nodejitsu.com",
 		"registry": "https://registry.nodejitsu.com/"
 	}
-]
+}
