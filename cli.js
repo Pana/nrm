@@ -186,7 +186,7 @@ function setCustomRegistry(config, cbk){
 }
 
 function getAllRegistry(){
-    return extend(registries, getCustomRegistry());
+    return extend({}, registries, getCustomRegistry());
 }
 
 function printErr(err){
