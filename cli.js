@@ -41,8 +41,8 @@ program
     .action(onDel);
 
 program
-    .command('home <registry> [brower]')
-    .description('open the homepage of registry with optional brower')
+    .command('home <registry> [browser]')
+    .description('open the homepage of registry with optional browser')
     .action(onHome);
 
 program
@@ -155,7 +155,7 @@ function onAdd(name, url, home){
     });
 }
 
-function onHome(name, brower){
+function onHome(name, browser){
     var allRegistries = getAllRegistry();
     if(!allRegistries.hasOwnProperty(name)){
         return;
@@ -165,8 +165,8 @@ function onHome(name, brower){
         return;
     }
     var args = [registry.home];
-    if(brower){
-        args.push(brower);
+    if(browser){
+        args.push(browser);
     }
     open.apply(null, args);
 }

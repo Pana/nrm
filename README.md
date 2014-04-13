@@ -42,7 +42,7 @@ Usage: nrm [options] [command]
     use <registry>         change registry to registry
     add <registry> <url> [home] add one custom registry
     del <registry>         delete one custom registry
-    home <registry> [brower] open the homepage of registry with optional brower
+    home <registry> [browser] open the homepage of registry with optional browser
     help                   print this help
 
   Options:
