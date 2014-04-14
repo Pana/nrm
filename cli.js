@@ -9,6 +9,9 @@ var ini = require('ini');
 var echo = require('node-echo');
 var extend = require('extend');
 var open = require('open');
+var async = require('async');
+var request = require('request');
+var only = require('only');
 
 var registries = require('./registries.json');
 var PKG = require('./package.json');
@@ -44,11 +47,17 @@ program
     .action(onHome);
 
 program
+    .command('test [registry]')
+    .description('show response time for specific or all registries')
+    .action(onTest);    
+
+program
     .command('help')
     .description('print this help')
     .action(program.help);
 
-program.parse(process.argv);
+program
+    .parse(process.argv);
 
 
 
@@ -160,6 +169,37 @@ function onHome(name, browser){
         if (browser) args.push(browser);
         open.apply(null, args);
     }
+}
+
+function onTest(registry){
+    var allRegistries = getAllRegistry();
+
+    var toTest;
+
+    if(registry){
+        if(!allRegistries.hasOwnProperty(registry)){
+            return;
+        }
+        toTest = only(allRegistries, registry);
+    }else{
+        toTest = allRegistries;
+    }
+
+    async.map(Object.keys(toTest), function(name, cbk){
+        var registry = toTest[name];
+        var start = +new Date();
+        request(registry.registry, function(error){
+            cbk(null, {
+                name: name
+                , time: (+new Date() - start)
+                , error: error ? true : false
+            });
+        });
+    }, function(err, results){
+        results.forEach(function(result){
+            console.log('  ' + result.name + line(result.name, 8) + (result.error ? 'Fetch Error' : result.time + 'ms'));
+        });
+    });
 }
 
 

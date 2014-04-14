@@ -38,12 +38,13 @@ Usage: nrm [options] [command]
 
   Commands:
 
-    ls                     list all the registries
-    use <registry>         change registry to registry
-    add <registry> <url> [home] add one custom registry
-    del <registry>         delete one custom registry
-    home <registry> [browser] open the homepage of registry with optional browser
-    help                   print this help
+    ls                           list all the registries
+    use <registry>               change registry to registry
+    add <registry> <url> [home]  add one custom registry
+    del <registry>               delete one custom registry
+    home <registry> [browser]    open the homepage of registry with optional browser
+    test [registry]              show the response time for one or all registries
+    help                         print this help
 
   Options:
 
