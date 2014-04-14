@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-    
+
     // system node_modules
 var path = require('path')
     , fs = require('fs')
@@ -11,6 +11,9 @@ var path = require('path')
     , echo = require('node-echo')
     , extend = require('extend')
     , open = require('open')
+    , async = require('async')
+    , request = require('request')
+    , only = require('only')
 
     // locals
     , registries = require('./registries.json')
@@ -44,6 +47,11 @@ program
     .command('home <registry> [browser]')
     .description('open the homepage of registry with optional browser')
     .action(onHome);
+
+program
+    .command('test [registry]')
+    .description('show response time for specific or all registry')
+    .action(onTest);
 
 program
     .command('help')
@@ -169,6 +177,37 @@ function onHome(name, browser){
         args.push(browser);
     }
     open.apply(null, args);
+}
+
+function onTest(registry){
+    var allRegistries = getAllRegistry();
+
+    var toTest;
+
+    if(registry){
+        if(!allRegistries.hasOwnProperty(registry)){
+            return;
+        }
+        toTest = only(allRegistries, registry);
+    }else{
+        toTest = allRegistries;
+    }
+
+    async.map(Object.keys(toTest), function(name, cbk){
+        var registry = toTest[name];
+        var start = +new Date();
+        request(registry.registry, function(error){
+            cbk(null, {
+                name: name,
+                time: (+new Date() - start),
+                error: error ? true : false
+            });
+        });
+    }, function(err, results){
+        results.forEach(function(result){
+            console.log('  ' + result.name + line(result.name, 8) + (result.error ? 'Fetch Error' : result.time + 'ms'));
+        });
+    });
 }
 
 function getCustomRegistry(){
