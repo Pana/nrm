@@ -58,7 +58,8 @@ program
     .description('print this help')
     .action(program.help);
 
-program.parse(process.argv);
+program
+    .parse(process.argv);
 
 
 function onList(){
@@ -198,9 +199,9 @@ function onTest(registry){
         var start = +new Date();
         request(registry.registry, function(error){
             cbk(null, {
-                name: name,
-                time: (+new Date() - start),
-                error: error ? true : false
+                name: name
+                , time: (+new Date() - start)
+                , error: error ? true : false
             });
         });
     }, function(err, results){
