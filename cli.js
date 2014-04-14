@@ -1,24 +1,22 @@
 #!/usr/bin/env node
     
-    // system node_modules
-var path = require('path')
-    , fs = require('fs')
+var path = require('path');
+var fs = require('fs');
 
-    // npm node_modules
-    , npmconf = require('npmconf')
-    , program = require('commander')
-    , ini = require('ini')
-    , echo = require('node-echo')
-    , extend = require('extend')
-    , open = require('open')
+var program = require('commander');
+var npmconf = require('npmconf');
+var ini = require('ini');
+var echo = require('node-echo');
+var extend = require('extend');
+var open = require('open');
 
-    // locals
-    , registries = require('./registries.json')
-    , pkg = require('./package.json')
-    ;
+var registries = require('./registries.json');
+var PKG = require('./package.json');
+var NRMRC = path.join(process.env.HOME, '.nrmrc');
+    
 
 program
-    .version(pkg.version);
+    .version(PKG.version);
 
 program
     .command('ls')
@@ -53,15 +51,13 @@ program
 program.parse(process.argv);
 
 
-function onList(){
-    npmconf.load(function(err, conf){
-        if(err){
-            printErr(err);
-            process.exit(1);
-        }
-        var cur = conf.get('registry');
-        var info = [''];
 
+
+/*//////////////// cmd methods /////////////////*/
+
+function onList() {
+    getCurrentRegistry(function (cur) {
+        var info = [''];
         var allRegistries = getAllRegistry();
 
         Object.keys(allRegistries).forEach(function(key){
@@ -71,7 +67,6 @@ function onList(){
         });
 
         info.push('');
-
         printMsg(info);
     });
 }
@@ -83,15 +78,13 @@ function onUse(name){
         var registry = allRegistries[name];
         npmconf.load(function(err, conf){
             if(err){
-                printErr(err);
-                process.exit(1);
+                exit(err);
             }
 
             conf.set('registry', registry.registry, 'user');
             conf.save('user', function(err){
                 if(err){
-                    printErr(err);
-                    process.exit(1);
+                    exit(err);
                 }
                 printMsg([
                     ''
@@ -106,7 +99,6 @@ function onUse(name){
             , '   Not find registry: ' + name
             , ''
         ]);
-        process.exit(1);
     }
 }
 
@@ -116,17 +108,22 @@ function onDel(name){
         return;
     }
 
-    delete customRegistries[name];
-    setCustomRegistry(customRegistries, function(err){
-        if(err){
-            printErr(err);
-            process.exit(1);
+    getCurrentRegistry(function (cur) {
+        if (cur === customRegistries[name].registry) {
+            onUse('npm');
         }
-        printMsg([
-            ''
-            , '    delete registry ' + name + ' success'
-            , ''
-        ]);
+
+        delete customRegistries[name];
+        setCustomRegistry(customRegistries, function(err){
+            if(err){
+                exit(err);
+            }
+            printMsg([
+                ''
+                , '    delete registry ' + name + ' success'
+                , ''
+            ]);
+        });
     });
 }
 
@@ -137,6 +134,7 @@ function onAdd(name, url, home){
     }
 
     var config = customRegistries[name] = {};
+    if (url[url.length-1] !== '/') url += '/';  // ensure url end with /
     config.registry = url;
     if(home){
         config.home = home;
@@ -144,8 +142,7 @@ function onAdd(name, url, home){
 
     setCustomRegistry(customRegistries, function(err){
         if(err){
-            printErr(err);
-            process.exit(1);
+            exit(err);
         }
         printMsg([
             ''
@@ -157,32 +154,37 @@ function onAdd(name, url, home){
 
 function onHome(name, browser){
     var allRegistries = getAllRegistry();
-    if(!allRegistries.hasOwnProperty(name)){
-        return;
+    var home = allRegistries[name] && allRegistries[name].home;
+    if (home) {
+        var args = [home];
+        if (browser) args.push(browser);
+        open.apply(null, args);
     }
-    var registry = allRegistries[name];
-    if(!registry.hasOwnProperty('home')){
-        return;
-    }
-    var args = [registry.home];
-    if(browser){
-        args.push(browser);
-    }
-    open.apply(null, args);
+}
+
+
+
+/*//////////////// helper methods /////////////////*/
+
+/*
+* get current registry
+*/
+function getCurrentRegistry (cbk) {
+    npmconf.load(function(err, conf){
+        if(err){
+            exit(err);
+        }
+
+        cbk(conf.get('registry'));
+    });
 }
 
 function getCustomRegistry(){
-    var file = path.join(process.env.HOME, '.nrmrc');
-    if(fs.existsSync(file)){
-        return ini.parse(fs.readFileSync(file, 'utf-8'));
-    }else{
-        return {};
-    }
+    return fs.existsSync(NRMRC) ? ini.parse(fs.readFileSync(NRMRC, 'utf-8')) : {};
 }
 
 function setCustomRegistry(config, cbk){
-    var file = path.join(process.env.HOME, '.nrmrc');
-    echo(ini.stringify(config), '>', file, cbk);
+    echo(ini.stringify(config), '>', NRMRC, cbk);
 }
 
 function getAllRegistry(){
@@ -197,6 +199,14 @@ function printMsg(infos){
     infos.forEach(function(info){
         console.log(info);
     });
+}
+
+/*
+* print message & exit
+*/
+function exit (err) {
+    printErr(err);
+    process.exit(1);
 }
 
 function line (str, len) {
