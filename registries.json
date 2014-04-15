@@ -7,6 +7,10 @@
 		"home": "http://cnpmjs.org",
 		"registry": "http://r.cnpmjs.org/"
 	},
+	"taobao": {
+		"home": "http://npm.taobao.org",
+		"registry": "http://registry.npm.taobao.org/"
+	},
 	"eu": {
 		"home": "http://npmjs.eu",
 		"registry": "http://registry.npmjs.eu/"
