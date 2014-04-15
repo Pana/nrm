@@ -1,8 +1,8 @@
-nrm
+nrm(1) -- npm registry manager
 ===
 
-`nrm` is short for `npm registry manager`. can help you easy and fast switch between
-different npm registries, now include: `npm`, `cnpm`, `eu`,  `au`, `sl(strongloop)`, `nj(nodejitsu)`.
+`nrm` can help you easy and fast switch between different npm registries,
+now include: `npm`, `cnpm`, `eu`,  `au`, `sl(strongloop)`, `nj(nodejitsu)`.
 
 Recently npm has some problem frequently, `nrm` will be helpful to all noders.
 
@@ -31,19 +31,27 @@ $ nrm use cnpm  //switch registry to cnpm
 
 ```
 
-## cmd
+## Usage
 
 ```
-nrm help       // show help
-nrm list       // show all registries
-nrm use cnpm   // switch to cnpm
-nrm home       // go to a registry home page
-nrm add        // add registry
-nrm del        // remove registry
-nrm test       // test the registries
 ```
+Usage: nrm [options] [command]
 
+  Commands:
 
+    ls                           list all the registries
+    use <registry>               change registry to registry
+    add <registry> <url> [home]  add one custom registry
+    del <registry>               delete one custom registry
+    home <registry> [browser]    open the homepage of registry with optional browser
+    test [registry]              show the response time for one or all registries
+    help                         print this help
+
+  Options:
+
+    -h, --help     output usage information
+    -V, --version  output the version number
+```
 
 ## Registries
 
@@ -53,12 +61,6 @@ nrm test       // test the registries
 * [european](http://npmjs.eu)
 * [australia](http://npmjs.org.au)
 * [nodejitsu](https://www.nodejitsu.com)
-
-## TODO
-
-* enable registry adding
-* add more registries
-
 
 ## LICENSE
 MIT

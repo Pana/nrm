@@ -1,249 +1,256 @@
 #!/usr/bin/env node
-var spawn       = require('child_process').spawn;
-var registries  = require('./registries.json');
-var version     = require('./package.json').version;
-var fs          = require('fs');
-var NPM         = process.platform === "win32" ? "npm.cmd" : "npm";
-var http        = require('http');
+var path = require('path');
+var fs = require('fs');
 
-if (!module.parent) {
-    var args    = process.argv.slice(2);
-    var cmd     = args[0];
-    var arg     = args[1];
-    var ar2     = args[2];
-    var ar3     = args[3];
-    switch (cmd) {
-        case 'ls':
-        case 'list':
-            printRegistries();
-            break;
-        case 'v':
-        case 'version':
-            printVersion();
-            break;
-        case 'use':
-            useRegistry(arg);
-            break;
-        case 'home':
-            openHome(arg);
-            break;
-        case 'add':
-            addRegistry(arg, ar2, ar3);
-            break;
-        case 'del':
-            delRegistry(arg);
-            break;
-        case 'test':
-            getTimes(httpGetFunc, arg, ar2);
-            break;
-        case 'h':
-        case 'help':
-        case undefined:
-        default:
-            help();
-            break;
+var program = require('commander');
+var npmconf = require('npmconf');
+var ini = require('ini');
+var echo = require('node-echo');
+var extend = require('extend');
+var open = require('open');
+var async = require('async');
+var request = require('request');
+var only = require('only');
+
+var registries = require('./registries.json');
+var PKG = require('./package.json');
+var NRMRC = path.join(process.env.HOME, '.nrmrc');
+    
+
+program
+    .version(PKG.version);
+
+program
+    .command('ls')
+    .description('list all the registries')
+    .action(onList);
+
+program
+    .command('use <registry>')
+    .description('change registry to registry')
+    .action(onUse);
+
+program
+    .command('add <registry> <url> [home]')
+    .description('add one custom registry')
+    .action(onAdd);
+
+program
+    .command('del <registry>')
+    .description('delete one custom registry')
+    .action(onDel);
+
+program
+    .command('home <registry> [browser]')
+    .description('open the homepage of registry with optional browser')
+    .action(onHome);
+
+program
+    .command('test [registry]')
+    .description('show response time for specific or all registries')
+    .action(onTest);    
+
+program
+    .command('help')
+    .description('print this help')
+    .action(program.help);
+
+program
+    .parse(process.argv);
+
+
+
+
+/*//////////////// cmd methods /////////////////*/
+
+function onList() {
+    getCurrentRegistry(function (cur) {
+        var info = [''];
+        var allRegistries = getAllRegistry();
+
+        Object.keys(allRegistries).forEach(function(key){
+            var item = allRegistries[key];
+            var prefix = item.registry === cur ? '* ' : '  ';
+            info.push(prefix + key + line(key, 8) + item.registry);
+        });
+
+        info.push('');
+        printMsg(info);
+    });
+}
+
+function onUse(name){
+    var allRegistries = getAllRegistry();
+
+    if(allRegistries.hasOwnProperty(name)){
+        var registry = allRegistries[name];
+        npmconf.load(function(err, conf){
+            if(err){
+                exit(err);
+            }
+
+            conf.set('registry', registry.registry, 'user');
+            conf.save('user', function(err){
+                if(err){
+                    exit(err);
+                }
+                printMsg([
+                    ''
+                    , '   Registry has been set to: ' + registry.registry
+                    , ''
+                ]);
+            });
+        });
+    }else{
+        printMsg([
+            ''
+            , '   Not find registry: ' + name
+            , ''
+        ]);
     }
 }
 
+function onDel(name){
+    var customRegistries = getCustomRegistry();
+    if(!customRegistries.hasOwnProperty(name)){
+        return;
+    }
 
-/*
-* run cmd
-*/
-function run (cmd, args, cbk) {
-    var ls = spawn(cmd, args);
-    var data = '', err = '';
-    ls.stdout.on('data', function (tmp) {
-        data += tmp;
-    });
-    ls.stderr.on('data', function (tmp) {
-        err += tmp;
-    });
-    ls.on('close', function (code) {
-        cbk && cbk(err, data);
+    getCurrentRegistry(function (cur) {
+        if (cur === customRegistries[name].registry) {
+            onUse('npm');
+        }
+
+        delete customRegistries[name];
+        setCustomRegistry(customRegistries, function(err){
+            if(err){
+                exit(err);
+            }
+            printMsg([
+                ''
+                , '    delete registry ' + name + ' success'
+                , ''
+            ]);
+        });
     });
 }
+
+function onAdd(name, url, home){
+    var customRegistries = getCustomRegistry();
+    if(customRegistries.hasOwnProperty(name)){
+        return;
+    }
+
+    var config = customRegistries[name] = {};
+    if (url[url.length-1] !== '/') url += '/';  // ensure url end with /
+    config.registry = url;
+    if(home){
+        config.home = home;
+    }
+
+    setCustomRegistry(customRegistries, function(err){
+        if(err){
+            exit(err);
+        }
+        printMsg([
+            ''
+            , '    add registry ' + name + ' success'
+            , ''
+        ]);
+    });
+}
+
+function onHome(name, browser){
+    var allRegistries = getAllRegistry();
+    var home = allRegistries[name] && allRegistries[name].home;
+    if (home) {
+        var args = [home];
+        if (browser) args.push(browser);
+        open.apply(null, args);
+    }
+}
+
+function onTest(registry){
+    var allRegistries = getAllRegistry();
+
+    var toTest;
+
+    if(registry){
+        if(!allRegistries.hasOwnProperty(registry)){
+            return;
+        }
+        toTest = only(allRegistries, registry);
+    }else{
+        toTest = allRegistries;
+    }
+
+    async.map(Object.keys(toTest), function(name, cbk){
+        var registry = toTest[name];
+        var start = +new Date();
+        request(registry.registry, function(error){
+            cbk(null, {
+                name: name
+                , time: (+new Date() - start)
+                , error: error ? true : false
+            });
+        });
+    }, function(err, results){
+        results.forEach(function(result){
+            console.log('  ' + result.name + line(result.name, 8) + (result.error ? 'Fetch Error' : result.time + 'ms'));
+        });
+    });
+}
+
+
+
+/*//////////////// helper methods /////////////////*/
 
 /*
 * get current registry
 */
-function getRegistry (cbk) {
-    run(NPM, ['config', 'get', 'registry'], cbk);
+function getCurrentRegistry (cbk) {
+    npmconf.load(function(err, conf){
+        if(err){
+            exit(err);
+        }
+
+        cbk(conf.get('registry'));
+    });
 }
 
-/*
-* set registry
-*/
-function setRegistry (registry, cbk) {
-    run(NPM, ['config', 'set', 'registry', registry], cbk);
+function getCustomRegistry(){
+    return fs.existsSync(NRMRC) ? ini.parse(fs.readFileSync(NRMRC, 'utf-8')) : {};
 }
 
-/*
-* print registry info
-*/
-function printRegistries () {
-    getRegistry(function (err, registry) {
-        if(err) return printErr(err);
-        // replace \n
-        registry = registry.replace(/\n/g, '');
+function setCustomRegistry(config, cbk){
+    echo(ini.stringify(config), '>', NRMRC, cbk);
+}
 
-        var info = [];
-        info.push('');
-        registries.forEach(function (item) {
-            var cur = item.registry ;
-            var curP = cur === registry ? "* " : "  ";
-            info.push(curP + item.name + line(item.name, 8) + item.registry);
-        });
-        info.push('');
-        printMessage(info);
+function getAllRegistry(){
+    return extend({}, registries, getCustomRegistry());
+}
+
+function printErr(err){
+    console.error('an error occured: ' + err);
+}
+
+function printMsg(infos){
+    infos.forEach(function(info){
+        console.log(info);
     });
 }
 
 /*
-* 
+* print message & exit
 */
+function exit (err) {
+    printErr(err);
+    process.exit(1);
+}
+
 function line (str, len) {
     var line = new Array(len - str.length).join('-');
     return ' ' + line + ' ';
-}
-
-/*
-*  print error
-*/
-function printErr (message) {
-    mesage = message || '';
-    console.log("Sorry some err happened " + message);
-}
-
-/*
-*  find registry by name or url
-*/
-function _findRegistry (registry) {
-    for (var i in registries) {
-        var r = registries[i];
-        if (r.name === registry || r.registry === registry)
-            return r
-    }
-    // not find registry, print message and exit
-    var message = [
-        "",
-        '   Not find registry: ' + registry,
-        ""
-    ];
-    printMessage(message);
-    process.exit();
-}
-
-function findRegistry (registry) {
-    var r = _findRegistry(registry);
-    return r.registry;
-}
-
-/*
-* use registry
-*/
-function useRegistry (registry) {
-    var r = findRegistry(registry);
-    if(!r && /http/.test(registry))
-        r = registry;
-
-    setRegistry(r, function (err, result) {
-        if(err)
-            printErr(err);
-        else{
-            var message = [
-                "",
-                '    Registry has been set to: ' + r,
-                ""
-            ];
-            printMessage(message);
-        }
-    });
-}
-
-/*
-* goto registry home
-*/
-function openHome (registry) {
-    var r = _findRegistry(registry);
-    run('open', [r.home]);
-}
-
-/*
-* Out put help message
-*/
-function help () {
-    var message = [
-        "",
-        "Usage: nrm cmd [arg]",
-        "",
-        "Options:",
-        "",
-        "  ls, list          list all the registries, with * is using now",
-        "  use registry      change registry to registry",
-        "  home x registry   open registry home page with x (x is you brower or other)",
-        "  v, version        output current version",
-        "  h, help           output help message",
-        "  del name          delete registry",
-        "  add name registry (home)",
-        "                    add registry (home is optional) ",
-        "  test time (name)  get the time of visiting registry (name is optional)",
-        "                    eg.  test 1000 au  (the unit of time is ms) ",
-        ""
-    ]
-    printMessage(message);
-}
-
-/*
-* output current version
-*/
-function printVersion () {
-    var message = [
-        "",
-        '    Current version: ' + version,
-        ""
-    ];
-    printMessage(message);
-}
-
-/*
-* print message
-*/
-function printMessage (msg) {
-    msg.forEach(function (i) {
-        console.log(i);
-    });
-}
-
-/*
-* add registry
-*/
-function addRegistry(name, registry, home){
-    registries.push({
-        'name': name, 
-        'registry': registry,
-        'home': home
-    });
-    fs.writeFile('./registries.json', JSON.stringify(registries, null, '\t'), function(e){
-        if (e) throw e;
-        console.log("Successfully add ", arg, " ", ar2);
-    });
-}
-
-/*
-* del registry
-*/
-function delRegistry(arg){
-    for (var i = 0; i < registries.length; i++) {
-        item = registries[i];
-        if (item.name == arg && i > 5){
-            if (registries.splice(i, 1)) {
-                console.log("Successfully delete " + item.name);
-            }
-        }
-    };
-    fs.writeFile('./registries.json', JSON.stringify(registries, null, '\t'), function(e){
-        if (e) throw e;
-    });
 }
 
 /*
