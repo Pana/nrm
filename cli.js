@@ -42,6 +42,11 @@ program
     .action(onDel);
 
 program
+    .command('rm <registry>')
+    .description('delete one custom registry')
+    .action(onDel);
+
+program
     .command('home <registry> [browser]')
     .description('open the homepage of registry with optional browser')
     .action(onHome);
