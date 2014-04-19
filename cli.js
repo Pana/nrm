@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-    
+
 var path = require('path');
 var fs = require('fs');
 
@@ -23,12 +23,12 @@ program
 
 program
     .command('ls')
-    .description('list all the registries')
+    .description('	list all the registries')
     .action(onList);
 
 program
     .command('use <registry>')
-    .description('change registry to registry')
+    .description('	change registry to registry')
     .action(onUse);
 
 program
@@ -38,27 +38,27 @@ program
 
 program
     .command('del <registry>')
-    .description('delete one custom registry')
+    .description('	delete one custom registry')
     .action(onDel);
 
 program
     .command('rm <registry>')
-    .description('delete one custom registry')
+    .description('	delete one custom registry')
     .action(onDel);
 
 program
     .command('home <registry> [browser]')
-    .description('open the homepage of registry with optional browser')
+    .description('	open the homepage of registry with optional browser')
     .action(onHome);
 
 program
     .command('test [registry]')
-    .description('show response time for specific or all registries')
+    .description('	show response time for specific or all registries')
     .action(onTest);    
 
 program
     .command('help')
-    .description('print this help')
+    .description('	print this help')
     .action(program.help);
 
 program

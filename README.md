@@ -36,6 +36,7 @@ $ nrm use cnpm  //switch registry to cnpm
 ## Usage
 
 ```
+```
 Usage: nrm [options] [command]
 
   Commands:
