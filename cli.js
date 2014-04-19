@@ -41,6 +41,11 @@ program
     .action(onDel);
 
 program
+    .command('rm <registry>')
+    .description('delete one custom registry')
+    .action(onDel);
+
+program
     .command('home <registry> [browser]')
     .description('open the homepage of registry with optional browser')
     .action(onHome);
@@ -190,13 +195,21 @@ function onTest(registry){
         request(registry.registry, function(error){
             cbk(null, {
                 name: name
+                , registry: registry.registry
                 , time: (+new Date() - start)
                 , error: error ? true : false
             });
         });
     }, function(err, results){
-        results.forEach(function(result){
-            console.log('  ' + result.name + line(result.name, 8) + (result.error ? 'Fetch Error' : result.time + 'ms'));
+        getCurrentRegistry(function(cur){
+            var msg = [''];
+            results.forEach(function(result){
+                var prefix = result.registry === cur ? '* ' : '  ';
+                var suffix = result.error ? 'Fetch Error' : result.time + 'ms';
+                msg.push(prefix + result.name + line(result.name, 8) + suffix);
+            });
+            msg.push('');
+            printMsg(msg);
         });
     });
 }
