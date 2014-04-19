@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 var path = require('path');
 var fs = require('fs');
 
@@ -264,80 +265,4 @@ function exit (err) {
 function line (str, len) {
     var line = new Array(len - str.length).join('-');
     return ' ' + line + ' ';
-}
-
-/*
-* The function of http get
-*/
-function httpGetFunc(name, options, timeout, cbk) {
-    var req_time    = null, req = null;
-    req_time        = setTimeout(function() {
-        req.destroy();
-    }, timeout);
-
-    req = http.get(options, function() {
-        clearTimeout(req_time);
-    });
-    req.on('response', function() {
-        req.destroy();
-        cbk();
-    });
-    req.on('error', function(e) {
-        if(req_time) {
-            clearTimeout(req_time);
-            console.log(name, '\t:', options['host']);
-            console.log('Timeout, error : ', e);
-        }
-    });
-}
-
-/*
-* get the test time
-*/
-function getTimes(httpGetFunc, basetime, registry) {
-    options = {
-        host : '',
-        port : '80',
-        path : '/'
-    }
-    if (registry != null) {
-        var regis   = findRegistry(registry);
-        var start   = new Date().getTime();
-        var pagenum = regis.match(/\:\/\/(.*)[\:]{0,1}([0-9]*)\//)[1];
-        cutUrl = pagenum.split(":");
-        if (cutUrl.length === 1) {
-            options['host'] = cutUrl[0];
-        }
-        else {
-            options['host'] = cutUrl[0];
-            options['port'] = cutUrl[1];
-        }
-        httpGetFunc(registry, options, Number(basetime), function() {
-            console.log('\t', registry, ' : ', new Date().getTime() - start, 'ms');
-        });
-    }
-    else {
-        registries.forEach(function(item) {
-            options = {
-                host : '',
-                port : '80',
-                path : '/'
-            }
-            var registry    = item.registry;
-            var start       = new Date().getTime();
-            var pagenum     = registry.match(/\:\/\/(.*)\//)[1];
-            cutUrl = pagenum.split(":");
-            if (cutUrl.length === 1) {
-                options['host'] = cutUrl[0];
-                options['port'] = 80;
-            }
-            else {
-                options['host'] = cutUrl[0];
-                options['port'] = cutUrl[1];
-            }
-            httpGetFunc(item.name, options, Number(basetime), function() {
-                console.log('\t', item.name, '\t: ', new Date().getTime() - start, 'ms');
-            });
-        });
-    }
 }
