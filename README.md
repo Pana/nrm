@@ -2,7 +2,7 @@ nrm(1) -- npm registry manager
 ===
 
 `nrm` can help you easy and fast switch between different npm registries,
-now include: `npm`, `cnpm`, `eu`,  `au`, `sl(strongloop)`, `nj(nodejitsu)`.
+now include: `npm`, `cnpm`, `eu`,  `au`, `sl(strongloop)`, `nj(nodejitsu)`, `pt(Portuguese)`.
 
 Recently npm has some problem frequently, `nrm` will be helpful to all noders.
 
@@ -23,6 +23,7 @@ $ nrm ls
   au ----- http://registry.npmjs.org.au/
   sl ----- http://npm.strongloop.com/
   nj ----- https://registry.nodejitsu.com/
+  pt ----- http://registry.npmjs.pt/
 
 ```
 
@@ -63,6 +64,7 @@ Usage: nrm [options] [command]
 * [australia](http://npmjs.org.au)
 * [nodejitsu](https://www.nodejitsu.com)
 * [taobao](http://npm.taobao.org/)
+* [Portuguese](http://npmjs.pt/)
 
 ## LICENSE
 MIT

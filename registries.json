@@ -26,5 +26,9 @@
 	"nj": {
 		"home": "https://www.nodejitsu.com",
 		"registry": "https://registry.nodejitsu.com/"
+	},
+	"pt": {
+		"home": "http://npmjs.pt",
+		"registry": "http://registry.npmjs.pt/"
 	}
 }
