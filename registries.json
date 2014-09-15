@@ -11,6 +11,10 @@
 		"home": "http://npm.taobao.org",
 		"registry": "http://registry.npm.taobao.org/"
 	},
+	"enpmjs": {
+		"home": "http://enpmjs.org",
+		"registry": "http://r.enpmjs.org/"
+	},
 	"eu": {
 		"home": "http://npmjs.eu",
 		"registry": "http://registry.npmjs.eu/"
