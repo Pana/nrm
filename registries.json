@@ -11,9 +11,9 @@
 		"home": "http://npm.taobao.org",
 		"registry": "http://registry.npm.taobao.org/"
 	},
-	"enpmjs": {
+	"edunpm": {
 		"home": "http://enpmjs.org",
-		"registry": "http://r.enpmjs.org/"
+		"registry": "http://registry.enpmjs.org/"
 	},
 	"eu": {
 		"home": "http://npmjs.eu",
