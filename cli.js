@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-    
+
 var path = require('path');
 var fs = require('fs');
 
@@ -16,7 +16,7 @@ var only = require('only');
 var registries = require('./registries.json');
 var PKG = require('./package.json');
 var NRMRC = path.join(process.env.HOME, '.nrmrc');
-    
+
 
 program
     .version(PKG.version);
@@ -54,7 +54,7 @@ program
 program
     .command('test [registry]')
     .description('show response time for specific or all registries')
-    .action(onTest);    
+    .action(onTest);
 
 program
     .command('help')
@@ -95,7 +95,10 @@ function onUse(name){
                 exit(err);
             }
 
-            conf.set('registry', registry.registry, 'user');
+            Object.keys(registry).forEach(function (key) {
+                conf.set(key, registry[key], 'user');
+            });
+
             conf.save('user', function(err){
                 if(err){
                     exit(err);
