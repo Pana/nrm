@@ -65,7 +65,10 @@ program
     .parse(process.argv);
 
 
-
+if(process.argv.length === 2){
+  console.log('nrm can help you easy and fast switch between different npm registries');
+  console.log('usages: nrm help');
+}
 
 /*//////////////// cmd methods /////////////////*/
 
