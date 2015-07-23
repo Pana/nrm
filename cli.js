@@ -27,6 +27,11 @@ program
     .action(onList);
 
 program
+    .command('current')
+    .description('show current registry name')
+    .action(showCurrent);
+
+program
     .command('use <registry>')
     .description('change registry to registry')
     .action(onUse);
@@ -86,6 +91,19 @@ function onList() {
         info.push('');
         printMsg(info);
     });
+}
+
+function showCurrent() {
+  getCurrentRegistry(function (cur) {
+    var allRegistries = getAllRegistry();
+    Object.keys(allRegistries).forEach(function (key) {
+      var item = allRegistries[key];
+      if (item.registry === cur) {
+        printMsg([key]);
+        return;
+      }
+    });
+  });
 }
 
 function onUse(name){
