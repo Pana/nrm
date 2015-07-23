@@ -37,12 +37,7 @@ program
     .action(onAdd);
 
 program
-    .command('del <registry>')
-    .description('delete one custom registry')
-    .action(onDel);
-
-program
-    .command('rm <registry>')
+    .command('del|rm <registry>')
     .description('delete one custom registry')
     .action(onDel);
 
