@@ -37,12 +37,7 @@ program
     .action(onAdd);
 
 program
-    .command('del <registry>')
-    .description('delete one custom registry')
-    .action(onDel);
-
-program
-    .command('rm <registry>')
+    .command('del|rm <registry>')
     .description('delete one custom registry')
     .action(onDel);
 
@@ -66,8 +61,7 @@ program
 
 
 if(process.argv.length === 2){
-  console.log('nrm can help you easy and fast switch between different npm registries');
-  console.log('usages: nrm help');
+  program.outputHelp();
 }
 
 /*//////////////// cmd methods /////////////////*/
