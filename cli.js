@@ -278,6 +278,6 @@ function exit (err) {
 }
 
 function line (str, len) {
-    var line = new Array(len - str.length).join('-');
+    var line = new Array(Math.max(1, len - str.length)).join('-');
     return ' ' + line + ' ';
 }
