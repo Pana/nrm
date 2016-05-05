@@ -11,28 +11,16 @@
 		"home": "http://npm.taobao.org",
 		"registry": "http://registry.npm.taobao.org/"
 	},
-	"edunpm": {
-		"home": "http://enpmjs.org",
-		"registry": "http://registry.enpmjs.org/"
-	},
-	"eu": {
-		"home": "http://npmjs.eu",
-		"registry": "http://registry.npmjs.eu/"
-	},
-	"au": {
-		"home": "http://npmjs.org.au",
-		"registry": "http://registry.npmjs.org.au/"
-	},
-	"sl": {
-		"home": "http://strongloop.com",
-		"registry": "http://npm.strongloop.com/"
-	},
 	"nj": {
 		"home": "https://www.nodejitsu.com",
 		"registry": "https://registry.nodejitsu.com/"
 	},
-	"pt": {
-		"home": "http://npmjs.pt",
-		"registry": "http://registry.npmjs.pt/"
+	"rednpm": {
+		"home": "http://npm.mirror.cqupt.edu.cn/",
+		"registry": "http://registry.mirror.cqupt.edu.cn"
+	},
+	"npmMirror": {
+		"home": "https://skimdb.npmjs.com/",
+		"registry": "https://skimdb.npmjs.com/registry"
 	}
 }

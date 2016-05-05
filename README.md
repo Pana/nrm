@@ -2,7 +2,7 @@ nrm(1) -- npm registry manager
 ===
 
 `nrm` can help you easy and fast switch between different npm registries,
-now include: `npm`, `cnpm`, `eu`,  `au`, `sl(strongloop)`, `nj(nodejitsu)`, `pt(Portuguese)`.
+now include: `npm`, `cnpm`, `nj(nodejitsu)`, `rednpm`.
 
 Recently npm has some problem frequently, `nrm` will be helpful to all noders.
 
@@ -16,14 +16,12 @@ $ npm install -g nrm
 ```
 $ nrm ls
 
-* npm ---- https://registry.npmjs.org/
-  cnpm --- http://r.cnpmjs.org/
-  taobao - http://registry.npm.taobao.org/
-  eu ----- http://registry.npmjs.eu/
-  au ----- http://registry.npmjs.org.au/
-  sl ----- http://npm.strongloop.com/
-  nj ----- https://registry.nodejitsu.com/
-  pt ----- http://registry.npmjs.pt/
+* npm -----  https://registry.npmjs.org/
+  cnpm ----  http://r.cnpmjs.org/
+  taobao --  http://registry.npm.taobao.org/
+  nj ------  https://registry.nodejitsu.com/
+  rednpm -- http://registry.mirror.cqupt.edu.cn
+  skimdb -- https://skimdb.npmjs.com/registry
 
 ```
 
@@ -59,12 +57,9 @@ Usage: nrm [options] [command]
 
 * [npm](https://www.npmjs.org)
 * [cnpm](http://cnpmjs.org)
-* [strongloop](http://strongloop.com)
-* [european](http://npmjs.eu)
-* [australia](http://npmjs.org.au)
 * [nodejitsu](https://www.nodejitsu.com)
 * [taobao](http://npm.taobao.org/)
-* [Portuguese](http://npmjs.pt/)
+* [rednpm](http://npm.mirror.cqupt.edu.cn)
 
 ## LICENSE
 MIT
