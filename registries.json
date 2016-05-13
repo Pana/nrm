@@ -8,8 +8,8 @@
 		"registry": "http://r.cnpmjs.org/"
 	},
 	"taobao": {
-		"home": "http://npm.taobao.org",
-		"registry": "http://registry.npm.taobao.org/"
+		"home": "https://npm.taobao.org",
+		"registry": "https://registry.npm.taobao.org/"
 	},
 	"nj": {
 		"home": "https://www.nodejitsu.com",
