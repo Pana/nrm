@@ -16,7 +16,7 @@ $ nrm ls
 
 * npm -----  https://registry.npmjs.org/
   cnpm ----  http://r.cnpmjs.org/
-  taobao --  http://registry.npm.taobao.org/
+  taobao --  https://registry.npm.taobao.org/
   nj ------  https://registry.nodejitsu.com/
   rednpm -- http://registry.mirror.cqupt.edu.cn
   skimdb -- https://skimdb.npmjs.com/registry
