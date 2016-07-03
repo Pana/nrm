@@ -110,7 +110,10 @@ function onUse(name){
                 exit(err);
             }
 
-            conf.set('registry', registry.registry, 'user');
+            Object.keys(registry).forEach(function (key) {
+                conf.set(key, registry[key], 'user');
+            });
+
             conf.save('user', function(err){
                 if(err){
                     exit(err);
