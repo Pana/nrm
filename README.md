@@ -2,7 +2,7 @@ nrm(1) -- npm registry manager
 ===
 
 `nrm` can help you easy and fast switch between different npm registries,
-now include: `npm`, `cnpm`, `nj(nodejitsu)`, `rednpm`.
+now include: `npm`, `cnpm`, `taobao`, `nj(nodejitsu)`, `rednpm`.
 
 ## Install
 
@@ -37,13 +37,13 @@ Usage: nrm [options] [command]
 
   Commands:
 
-    ls                           list all the registries
-    use <registry>               change registry to registry
-    add <registry> <url> [home]  add one custom registry
-    del <registry>               delete one custom registry
-    home <registry> [browser]    open the homepage of registry with optional browser
-    test [registry]              show the response time for one or all registries
-    help                         print this help
+    ls                           List all the registries
+    use <registry>               Change registry to registry
+    add <registry> <url> [home]  Add one custom registry
+    del <registry>               Delete one custom registry
+    home <registry> [browser]    Open the homepage of registry with optional browser
+    test [registry]              Show the response time for one or all registries
+    help                         Print this help
 
   Options:
 
@@ -58,6 +58,11 @@ Usage: nrm [options] [command]
 * [nodejitsu](https://www.nodejitsu.com)
 * [taobao](http://npm.taobao.org/)
 * [rednpm](http://npm.mirror.cqupt.edu.cn)
+
+
+## Notice
+
+When you use an other registry, you can not use the `publish` command. 
 
 ## LICENSE
 MIT
