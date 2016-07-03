@@ -4,8 +4,6 @@ nrm(1) -- npm registry manager
 `nrm` can help you easy and fast switch between different npm registries,
 now include: `npm`, `cnpm`, `nj(nodejitsu)`, `rednpm`.
 
-Recently npm has some problem frequently, `nrm` will be helpful to all noders.
-
 ## Install
 
 ```
