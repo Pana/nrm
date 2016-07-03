@@ -2,7 +2,7 @@
 var path = require('path');
 var fs = require('fs');
 var program = require('commander');
-var npmconf = require('npmconf');
+var npm = require('npm');
 var ini = require('ini');
 var echo = require('node-echo');
 var extend = require('extend');
@@ -100,23 +100,18 @@ function showCurrent() {
 
 function onUse(name) {
     var allRegistries = getAllRegistry();
-
     if (allRegistries.hasOwnProperty(name)) {
         var registry = allRegistries[name];
-        npmconf.load(function(err, conf) {
-            if (err) {
-                exit(err);
-            }
-
-            conf.set('registry', registry.registry, 'user');
-            conf.save('user', function(err) {
-                if (err) {
-                    exit(err);
-                }
+        npm.load(function (err) {
+            if (err) return exit(err);
+            npm.commands.config(['set', 'registry', registry.registry], function (err, data) {
+                if (err) return exit(err);
+                console.log('                        ');
+                var newR = npm.config.get('registry');
                 printMsg([
-                    '', '   Registry has been set to: ' + registry.registry, ''
+                    '', '   Registry has been set to: ' + newR, ''
                 ]);
-            });
+            })
         });
     } else {
         printMsg([
@@ -216,12 +211,9 @@ function onTest(registry) {
  * get current registry
  */
 function getCurrentRegistry(cbk) {
-    npmconf.load(function(err, conf) {
-        if (err) {
-            exit(err);
-        }
-
-        cbk(conf.get('registry'));
+    npm.load(function(err, conf) {
+        if (err) return exit(err);
+        cbk(npm.config.get('registry'));
     });
 }
 

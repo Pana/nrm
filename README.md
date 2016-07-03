@@ -1,4 +1,4 @@
-nrm(1) -- npm registry manager
+nrm -- NPM registry manager
 ===
 
 [![NPM version][npm-image]][npm-url]
@@ -68,7 +68,6 @@ When you use an other registry, you can not use the `publish` command.
 
 ## TODO
 
-* Use npm itself to set config 
 * When publish proxy to npm official registry
 
 ## LICENSE
