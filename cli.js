@@ -73,11 +73,12 @@ function onList() {
     getCurrentRegistry(function(cur) {
         var info = [''];
         var allRegistries = getAllRegistry();
+        var len = getMaxLen(allRegistries);
 
         Object.keys(allRegistries).forEach(function(key) {
             var item = allRegistries[key];
             var prefix = item.registry === cur ? '* ' : '  ';
-            info.push(prefix + key + line(key, 8) + item.registry);
+            info.push(prefix + key + line(key, len) + item.registry);
         });
 
         info.push('');
@@ -192,10 +193,11 @@ function onTest(registry) {
     }, function(err, results) {
         getCurrentRegistry(function(cur) {
             var msg = [''];
+            var len = getMaxLen(allRegistries);
             results.forEach(function(result) {
                 var prefix = result.registry === cur ? '* ' : '  ';
                 var suffix = result.error ? 'Fetch Error' : result.time + 'ms';
-                msg.push(prefix + result.name + line(result.name, 8) + suffix);
+                msg.push(prefix + result.name + line(result.name, len) + suffix);
             });
             msg.push('');
             printMsg(msg);
@@ -250,4 +252,14 @@ function exit(err) {
 function line(str, len) {
     var line = new Array(Math.max(1, len - str.length)).join('-');
     return ' ' + line + ' ';
+}
+
+function getMaxLen(registries) {
+    var len = 0;
+    Object.keys(registries).forEach(function (registry) {
+        if (registry.length > len) {
+            len = registry.length;
+        }
+    });
+    return len + 2;
 }
