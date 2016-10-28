@@ -57,7 +57,7 @@ program
 program
     .command('help')
     .description('Print this help')
-    .action(program.help);
+    .action(onHelp);
 
 program
     .parse(process.argv);
@@ -162,6 +162,10 @@ function onHome(name, browser) {
         if (browser) args.push(browser);
         open.apply(null, args);
     }
+}
+
+function onHelp(cmd) {
+    program.outputHelp()
 }
 
 function onTest(registry) {
