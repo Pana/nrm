@@ -181,12 +181,12 @@ function onTest(registry) {
     async.map(Object.keys(toTest), function(name, cbk) {
         var registry = toTest[name];
         var start = +new Date();
-        request(registry.registry + 'pedding', function(error) {
+        request(registry.registry + 'pedding', function(error, response) {
             cbk(null, {
                 name: name,
                 registry: registry.registry,
                 time: (+new Date() - start),
-                error: error ? true : false
+                error: error || response.statusCode !== 200 ? true : false
             });
         });
     }, function(err, results) {
