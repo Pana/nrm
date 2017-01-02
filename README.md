@@ -53,6 +53,10 @@ Usage: nrm [options] [command]
     -V, --version  output the version number
 ```
 
+## How to configure yarn to use private registry ?
+just add .yarnrc in your project’s directory and write there:
+`registry “http://your.registry”`
+
 ## Registries
 
 * [npm](https://www.npmjs.org)
@@ -64,7 +68,7 @@ Usage: nrm [options] [command]
 
 ## Notice
 
-When you use an other registry, you can not use the `publish` command. 
+When you use an other registry, you can not use the `publish` command.
 
 ## TODO
 
