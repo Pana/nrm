@@ -6,6 +6,13 @@ nrm -- NPM registry manager
 `nrm` can help you easy and fast switch between different npm registries,
 now include: `npm`, `cnpm`, `taobao`, `nj(nodejitsu)`, `rednpm`.
 
+## How to configure yarn to use private registry ?
+just add .yarnrc in your project’s directory and write there:
+`registry “http://your.registry”`
+
+Or you can configure it in your HOME directory's .yarnrc
+
+
 ## Install
 
 ```
@@ -52,10 +59,6 @@ Usage: nrm [options] [command]
     -h, --help     output usage information
     -V, --version  output the version number
 ```
-
-## How to configure yarn to use private registry ?
-just add .yarnrc in your project’s directory and write there:
-`registry “http://your.registry”`
 
 ## Registries
 
