@@ -57,7 +57,9 @@ program
 program
     .command('help')
     .description('Print this help')
-    .action(program.help);
+    .action(function () {
+        program.outputHelp();
+    });
 
 program
     .parse(process.argv);
