@@ -106,14 +106,20 @@ function onUse(name) {
         var registry = allRegistries[name];
         npm.load(function (err) {
             if (err) return exit(err);
-            npm.commands.config(['set', 'registry', registry.registry], function (err, data) {
-                if (err) return exit(err);
-                console.log('                        ');
-                var newR = npm.config.get('registry');
+            var lastRegistryUrl = npm.config.get('registry')
+            if(registry.registry === lastRegistryUrl) {
                 printMsg([
-                    '', '   Registry has been set to: ' + newR, ''
+                    '', '   Registry already in use: ' + name, ''
                 ]);
-            })
+            } else {
+                var lastRegistry = {}
+                for(var k in allRegistries) {
+                    if(allRegistries.hasOwnProperty(k) && allRegistries[k].registry === lastRegistryUrl) {
+                        lastRegistry = allRegistries[k]
+                    }
+                }
+                updateNpmConfig(registry, lastRegistry)
+            }
         });
     } else {
         printMsg([
@@ -252,4 +258,35 @@ function exit(err) {
 function line(str, len) {
     var line = new Array(Math.max(1, len - str.length)).join('-');
     return ' ' + line + ' ';
+}
+
+function updateNpmConfig(registry, lastRegistry) {  
+    var updates = [];
+    var infos = [];
+
+    function npmconfig(reg, cmd) {
+        for(var key in reg) {
+            if(reg.hasOwnProperty(key)) {
+                updates.unshift((function(key) {
+                    return function(x, callback) {
+                        npm.commands.config([cmd, key, reg[key]], function(err, data) {
+                            callback(null, null)
+                        })
+                    }
+                })(key))    
+            }
+        }
+    }
+
+    npmconfig(lastRegistry, 'delete');
+    npmconfig(registry, 'set');
+
+    async.compose(...updates)([], function(err) {
+        if(err) {
+            infos.push('\nRegistry set failed: ' + registry.registry)
+        } else {
+            infos.push('\nRegistry set to: ' + registry.registry)
+        }
+        printMsg(infos)
+    });
 }
