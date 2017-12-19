@@ -106,14 +106,18 @@ function onUse(name) {
         var registry = allRegistries[name];
         npm.load(function (err) {
             if (err) return exit(err);
-            npm.commands.config(['set', 'registry', registry.registry], function (err, data) {
-                if (err) return exit(err);
-                console.log('                        ');
-                var newR = npm.config.get('registry');
-                printMsg([
-                    '', '   Registry has been set to: ' + newR, ''
-                ]);
-            })
+            for(var key in registry) {
+                if(registry.hasOwnProperty(key)) {
+                    npm.commands.config(['set', key, registry[key]], function (err, data) {
+                        if (err) return exit(err);
+                        console.log('                        ');
+                        var value = npm.config.get(key);
+                        printMsg([
+                            '', '   ' + key + ' has been set to: ' + value, ''
+                        ]);
+                    })
+                }
+            }
         });
     } else {
         printMsg([

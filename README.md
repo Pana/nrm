@@ -60,6 +60,31 @@ Usage: nrm [options] [command]
     -V, --version  output the version number
 ```
 
+## Customize Registry
+
+You can customize your registry by editing `~/.nrmrc`
+
+e.g.
+
+After `nrm add some-registry http://npm.some-registry.com`, your `nrmrc` would be like this:
+
+```ini
+[some-registry]
+registry=http://npm.some-registry.com
+```
+
+You can simply attach other settings to this registry, like a proxy for this registry:
+```ini
+[some-registry]
+registry=http://npm.some-registry.com
+proxy=http://my-proxy-for-this-registry.com
+```
+
+All your config in `~/.gitconfig` should be work here.
+
+By doing this, whenever registry get switched by `nrm use <registry>`, the config(if you have any registry specific config) get switched as well.
+
+
 ## Registries
 
 * [npm](https://www.npmjs.org)
