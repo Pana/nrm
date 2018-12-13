@@ -46,13 +46,15 @@ Usage: nrm [options] [command]
 
   Commands:
 
-    ls                           List all the registries
-    use <registry>               Change registry to registry
-    add <registry> <url> [home]  Add one custom registry
-    del <registry>               Delete one custom registry
-    home <registry> [browser]    Open the homepage of registry with optional browser
-    test [registry]              Show the response time for one or all registries
-    help                         Print this help
+    ls                                    List all the registries
+    use <registry>                        Change registry to registry
+    add <registry> <url> [home]           Add one custom registry
+    set-auth <registry> <value> [always]  Set authorize information for a custom registry
+    set-email <registry> <value>          Set email for a custom registry
+    del <registry>                        Delete one custom registry
+    home <registry> [browser]             Open the homepage of registry with optional browser
+    test [registry]                       Show the response time for one or all registries
+    help                                  Print this help
 
   Options:
 
