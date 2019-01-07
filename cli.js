@@ -65,7 +65,7 @@ program
     .action(onTest);
 
 program
-    .command('help')
+    .command('help', { isDefault: true })
     .description('Print this help')
     .action(function () {
         program.outputHelp();
