@@ -40,6 +40,16 @@ program
     .action(onAdd);
 
 program
+    .command('set-auth <registry> <value> [always]')
+    .description('Set authorize information for a custom registry')
+    .action(onSetAuth);
+
+program
+    .command('set-email <registry> <value>')
+    .description('Set email for a custom registry')
+    .action(onSetEmail);
+
+program
     .command('del <registry>')
     .description('Delete one custom registry')
     .action(onDel);
@@ -55,7 +65,7 @@ program
     .action(onTest);
 
 program
-    .command('help')
+    .command('help', { isDefault: true })
     .description('Print this help')
     .action(function () {
         program.outputHelp();
@@ -99,6 +109,21 @@ function showCurrent() {
         });
     });
 }
+function config(attrArray, registry, index = 0) {
+    return new Promise((resolve, reject) => {
+        const attr =  attrArray[index];
+        const command = registry.hasOwnProperty(attr) ? ['set', attr, String(registry[attr])] : ['delete', attr];
+        npm.commands.config(command, function (err, data) {
+            return err ? reject(err) : resolve(index + 1);
+        });
+    }).then(next => {
+        if (next < attrArray.length) {
+            return config(attrArray, registry, next);
+        } else {
+            return Promise.resolve();
+        }
+    });
+}
 
 function onUse(name) {
     var allRegistries = getAllRegistry();
@@ -106,14 +131,20 @@ function onUse(name) {
         var registry = allRegistries[name];
         npm.load(function (err) {
             if (err) return exit(err);
-            npm.commands.config(['set', 'registry', registry.registry], function (err, data) {
-                if (err) return exit(err);
+            const attrs = ['registry', 'home', '_auth', 'email', 'always-auth'];
+            for (let attr in registry) {
+                if (!attrs.includes(attr));
+                attrs.push(attr);
+            }
+            config(attrs, registry).then(() => {
                 console.log('                        ');
                 var newR = npm.config.get('registry');
                 printMsg([
                     '', '   Registry has been set to: ' + newR, ''
                 ]);
-            })
+            }).catch(err => {
+                exit(err);
+            });
         });
     } else {
         printMsg([
@@ -153,6 +184,31 @@ function onAdd(name, url, home) {
         printMsg([
             '', '    add registry ' + name + ' success', ''
         ]);
+    });
+}
+
+function onSetAuth(registry, value, always) {
+    var customRegistries = getCustomRegistry();
+    if (!customRegistries.hasOwnProperty(registry)) return;
+    var config = customRegistries[registry];
+    config._auth = value;
+    if (always) {
+        config['always-auth'] = always;
+    }
+    setCustomRegistry(customRegistries, function(err) {
+        if (err) return exit(err);
+        printMsg(['', '    set authorize info to registry ' + registry + ' success', '']);
+    });
+}
+
+function onSetEmail(registry, value) {
+    var customRegistries = getCustomRegistry();
+    if (!customRegistries.hasOwnProperty(registry)) return;
+    var config = customRegistries[registry];
+    config.email = value;
+    setCustomRegistry(customRegistries, function(err) {
+        if (err) return exit(err);
+        printMsg(['', '    set email to registry ' + registry + ' success', '']);
     });
 }
 
