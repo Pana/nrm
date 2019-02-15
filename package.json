@@ -1,7 +1,7 @@
 {
   "name": "nrm",
   "version": "1.0.2",
-  "description": "NPM registry manager can help you easy and fast switch between different npm registries, now include: cnpm, taobao, nj(nodejitsu), rednpm, edunpm",
+  "description": "NPM registry manager can help you easy and fast switch between different npm registries, now include: cnpm, taobao, nj(nodejitsu), edunpm",
   "bin": "./cli.js",
   "repository": {
     "type": "git",
