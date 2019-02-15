@@ -75,6 +75,11 @@ Usage: nrm [options] [command]
 
 When you use an other registry, you can not use the `publish` command.
 
+## Maintainer is wanted
+
+If you find nrm is useful and is a experienced node.js developer, then you can help maintain nrm.
+If you have the interest you can reach me through email: pana.wang@outlook.com
+
 ## TODO
 
 * When publish proxy to npm official registry
