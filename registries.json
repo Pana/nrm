@@ -15,10 +15,6 @@
         "home": "https://www.nodejitsu.com",
         "registry": "https://registry.nodejitsu.com/"
     },
-    "rednpm": {
-        "home": "http://npm.mirror.cqupt.edu.cn/",
-        "registry": "http://registry.mirror.cqupt.edu.cn/"
-    },
     "npmMirror": {
         "home": "https://skimdb.npmjs.com/",
         "registry": "https://skimdb.npmjs.com/registry/"
