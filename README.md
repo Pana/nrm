@@ -4,7 +4,7 @@ nrm -- NPM registry manager
 [![NPM version][npm-image]][npm-url]
 
 `nrm` can help you easy and fast switch between different npm registries,
-now include: `npm`, `cnpm`, `taobao`, `nj(nodejitsu)`, `rednpm`.
+now include: `npm`, `cnpm`, `taobao`, `nj(nodejitsu)`.
 
 ## How to configure yarn to use private registry ?
 just add .yarnrc in your project’s directory and write there:
@@ -27,7 +27,6 @@ $ nrm ls
   cnpm ----  http://r.cnpmjs.org/
   taobao --  https://registry.npm.taobao.org/
   nj ------  https://registry.nodejitsu.com/
-  rednpm -- http://registry.mirror.cqupt.edu.cn
   skimdb -- https://skimdb.npmjs.com/registry
 
 ```
@@ -70,12 +69,16 @@ Usage: nrm [options] [command]
 * [cnpm](http://cnpmjs.org)
 * [nodejitsu](https://www.nodejitsu.com)
 * [taobao](http://npm.taobao.org/)
-* [rednpm](http://npm.mirror.cqupt.edu.cn)
 
 
 ## Notice
 
 When you use an other registry, you can not use the `publish` command.
+
+## Maintainer is wanted
+
+If you find nrm is useful and is a experienced node.js developer, then you can help maintain nrm.
+If you have the interest you can reach me through email: pana.wang@outlook.com
 
 ## TODO
 
