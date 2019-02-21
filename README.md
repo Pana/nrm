@@ -46,6 +46,7 @@ Usage: nrm [options] [command]
   Commands:
 
     ls                                    List all the registries
+    current                               Show current registry name
     use <registry>                        Change registry to registry
     add <registry> <url> [home]           Add one custom registry
     set-auth <registry> <value> [always]  Set authorize information for a custom registry
