@@ -264,67 +264,80 @@ function onHome(name, browser) {
 
 function onPublish(tarballOrFolder, cmd) {
     getCurrentRegistry(registry => {
-        var customRegistries = getCustomRegistry();
+        const customRegistries = getCustomRegistry();
         var currentRegistry;
+        // find current using custom registry
         Object.keys(customRegistries).forEach(function(key) {
-            var item = customRegistries[key];
+            const item = customRegistries[key];
             if (item.registry === registry && item['is-current']) {
                 currentRegistry = item;
                 currentRegistry.name = key;
-                return;
             }
         });
-        if (currentRegistry) {
-            if (currentRegistry[FIELD_REPOSITORY]) {
-                const optionData = {
-                    registry: currentRegistry[FIELD_REPOSITORY]
-                };
-                const attrs = ['registry'];
-                let command = `npm publish --registry ${currentRegistry[FIELD_REPOSITORY]}`;
-                cmd.options.forEach(option => {
-                    const opt = option.long.substring(2);
-                    const optionValue = cmd[opt];
-                    if (optionValue) {
-                        command += ` ${option.long} ${optionValue}`;
-                        optionData[opt] = cmd[opt];
-                        attrs.push(opt);
-                    }
-                });
-                console.info(command);
-                new Promise((resolve, reject) => {
-                    attrs.length ? resolve(config(attrs, optionData)) : resolve();
-                }).then(() => {
-                    const callback = (err) => {
-                        new Promise(resolve => {
-                            attrs.length ? resolve(config(attrs, currentRegistry)) : resolve();
-                        }).then(() => {
-                            if (err) {
-                                exit(err);
-                            }
-                            printMsg([ '',
-                            `   published to registry ${currentRegistry[FIELD_REPOSITORY]} successfully.`,
-                            '']);
-                        }).catch(err => {
-                            exit(err);
-                        });
-                    };
-                    try {
-                        tarballOrFolder ? npm.publish(tarballOrFolder, callback) : npm.publish(callback);
-                    } catch (e) {
-                        callback(err);
-                    }
-                });
+        const attrs = ['registry'];
+        let command = '> npm publish';
+        const optionData = {};
+        cmd.options.forEach(option => {
+            const opt = option.long.substring(2);
+            const optionValue = cmd[opt];
+            if (optionValue) {
+                optionData[opt] = cmd[opt];
+                attrs.push(opt);
+            }
+        });
+        new Promise((resolve, reject) => {
+            if (currentRegistry) {
+                if (currentRegistry[FIELD_REPOSITORY]) {
+                    printMsg([ '',
+                    '   current registry is a custom registry, publish to custom repository.',
+                    '']);
+                    optionData.registry = currentRegistry[FIELD_REPOSITORY];
+                    command += ` --registry ${currentRegistry[FIELD_REPOSITORY]}`;
+                    Object.keys(optionData).forEach((key) => {
+                        command += ` --${key} ${optionData[key]}`;
+                    });
+                    printMsg([command]);
+                    resolve(config(attrs, optionData));
+                } else {
+                    reject(new Error(`   current using registry [${currentRegistry.name}] has no ${FIELD_REPOSITORY} field, can't execute publish.`));
+                }
             } else {
                 printMsg([ '',
-                `   current using registry [${currentRegistry.name}] has no ${FIELD_REPOSITORY} field, can't execute publish.`,
+                '   current using registry is not a custom registry, will publish to npm official repository.',
                 '']);
+                optionData.registry = registries.npm.registry;
+                // find current using registry
+                Object.keys(registries).forEach(function(key) {
+                    const item = registries[key];
+                    if (item.registry === registry) {
+                        currentRegistry = item;
+                        currentRegistry.name = key;
+                    }
+                });
+                printMsg([command]);
+                resolve(config(attrs, optionData));
             }
-        } else {
-            printMsg([ '',
-            `   current using registry is not a custom registry, will run npm publish directly.`,
-            '']);
-            tarballOrFolder ? npm.publish(tarballOrFolder) : npm.publish();
-        }
+        }).then(() => {
+            const callback = (err) => {
+                config(attrs, currentRegistry).then(() => {
+                    if (err) {
+                        exit(err);
+                    }
+                    printMsg([ '',
+                    `   published to registry ${currentRegistry[FIELD_REPOSITORY]} successfully.`,
+                    '']);
+                }).catch(err => {
+                    exit(err);
+                });
+            };
+            try {
+                tarballOrFolder ? npm.publish(tarballOrFolder, callback) : npm.publish(callback);
+            } catch (e) {
+                callback(err);
+            }
+        }).catch(err => {
+            printErr(err);
+        });
     });
 }
 

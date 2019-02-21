@@ -73,7 +73,8 @@ Usage: nrm [options] [command]
 
 ## Notice
 
-When you use an other registry, you can not use the `publish` command.
+When you are using preset registries the `publish` command will proxy to the npm official registry.
+When you are using a custom registry you will need to run the `set-hosted-repo` to set a url to publish pacakges to your hosted registry.
 
 ## Maintainer is wanted
 
@@ -82,7 +83,7 @@ If you have the interest you can reach me through email: pana.wang@outlook.com
 
 ## TODO
 
-* When publish proxy to npm official registry
+* None
 
 ## LICENSE
 MIT
