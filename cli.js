@@ -1,24 +1,27 @@
 #!/usr/bin/env node
-var path = require('path');
-var fs = require('fs');
-var program = require('commander');
-var npm = require('npm');
-var ini = require('ini');
-var echo = require('node-echo');
-var extend = require('extend');
-var open = require('open');
-var async = require('async');
-var request = require('request');
-var only = require('only');
 
-var registries = require('./registries.json');
-var PKG = require('./package.json');
-var NRMRC = path.join(process.env.HOME, '.nrmrc');
+const path = require('path');
+const fs = require('fs');
+const program = require('commander');
+const npm = require('npm');
+const ini = require('ini');
+const echo = require('node-echo');
+const extend = require('extend');
+const open = require('open');
+const async = require('async');
+const request = require('request');
+const only = require('only');
 
-var REGISTRY_ATTRS = [];
-var FIELD_IS_CURRENT = 'is-current';
-var FIELD_REPOSITORY = 'repository';
-var IGNORED_ATTRS = [FIELD_IS_CURRENT, FIELD_REPOSITORY];
+const registries = require('./registries.json');
+const PKG = require('./package.json');
+const NRMRC = path.join(process.env.HOME, '.nrmrc');
+
+const REGISTRY_ATTRS = [];
+const FIELD_AUTH = '_auth';
+const FIELD_ALWAYS_AUTH = 'always-auth';
+const FIELD_IS_CURRENT = 'is-current';
+const FIELD_REPOSITORY = 'repository';
+const IGNORED_ATTRS = [FIELD_IS_CURRENT, FIELD_REPOSITORY];
 
 
 program
@@ -45,8 +48,11 @@ program
     .action(onAdd);
 
 program
-    .command('set-auth <registry> <value> [always]')
-    .description('Set authorize information for a custom registry')
+    .command('set-auth <registry> [value]')
+    .option('-a, --always-auth', 'Set is always auth')
+    .option('-u, --username <username>', 'Your user name for this registry')
+    .option('-p, --password <password>', 'Your password for this registry')
+    .description('Set authorize information for a custom registry with a base64 encoded string or username and pasword')
     .action(onSetAuth);
 
 program
@@ -86,7 +92,7 @@ program
 program
     .command('help', { isDefault: true })
     .description('Print this help')
-    .action(function () {
+    .action(function() {
         program.outputHelp();
     });
 
@@ -128,11 +134,12 @@ function showCurrent() {
         });
     });
 }
+
 function config(attrArray, registry, index = 0) {
     return new Promise((resolve, reject) => {
-        const attr =  attrArray[index];
+        const attr = attrArray[index];
         const command = registry.hasOwnProperty(attr) ? ['set', attr, String(registry[attr])] : ['delete', attr];
-        npm.commands.config(command, function (err, data) {
+        npm.commands.config(command, function(err, data) {
             return err ? reject(err) : resolve(index + 1);
         });
     }).then(next => {
@@ -148,7 +155,7 @@ function onUse(name) {
     var allRegistries = getAllRegistry();
     if (allRegistries.hasOwnProperty(name)) {
         var registry = allRegistries[name];
-        npm.load(function (err) {
+        npm.load(function(err) {
             if (err) return exit(err);
             const attrs = [].concat(REGISTRY_ATTRS);
             for (let attr in registry) {
@@ -168,17 +175,13 @@ function onUse(name) {
                     customRegistries[name] = registry;
                 }
                 setCustomRegistry(customRegistries);
-                printMsg([
-                    '', '   Registry has been set to: ' + newR, ''
-                ]);
+                printMsg(['', '   Registry has been set to: ' + newR, '']);
             }).catch(err => {
                 exit(err);
             });
         });
     } else {
-        printMsg([
-            '', '   Not find registry: ' + name, ''
-        ]);
+        printMsg(['', '   Not find registry: ' + name, '']);
     }
 }
 
@@ -192,9 +195,7 @@ function onDel(name) {
         delete customRegistries[name];
         setCustomRegistry(customRegistries, function(err) {
             if (err) return exit(err);
-            printMsg([
-                '', '    delete registry ' + name + ' success', ''
-            ]);
+            printMsg(['', '    delete registry ' + name + ' success', '']);
         });
     });
 }
@@ -210,35 +211,51 @@ function onAdd(name, url, home) {
     }
     setCustomRegistry(customRegistries, function(err) {
         if (err) return exit(err);
-        printMsg([
-            '', '    add registry ' + name + ' success', ''
-        ]);
+        printMsg(['', '    add registry ' + name + ' success', '']);
     });
 }
 
-function onSetAuth(registry, value, always) {
-    var customRegistries = getCustomRegistry();
+function onSetAuth(registry, value, cmd) {
+    const customRegistries = getCustomRegistry();
     if (!customRegistries.hasOwnProperty(registry)) return;
-    var config = customRegistries[registry];
-    config._auth = value;
-    if (always) {
-        config['always-auth'] = always;
+    const config = customRegistries[registry];
+    const attrs = [FIELD_AUTH];
+    if (value) {
+        config[FIELD_AUTH] = value;
+    } else if (cmd.username && cmd.password) {
+        config[FIELD_AUTH] = new Buffer(`${cmd.username}:${cmd.password}`).toString('base64');
+    } else {
+        return exit(new Error('your username & password or auth value is required'));
     }
-    setCustomRegistry(customRegistries, function(err) {
-        if (err) return exit(err);
-        printMsg(['', '    set authorize info to registry ' + registry + ' success', '']);
-    });
+    if (cmd[FIELD_ALWAYS_AUTH]) {
+        config[FIELD_ALWAYS_AUTH] = true;
+        attrs.push(FIELD_ALWAYS_AUTH);
+    }
+    new Promise(resolve => {
+        config[FIELD_IS_CURRENT] ? resolve(config(attrs, config)) : resolve();
+    }).then(() => {
+        customRegistries[registry] = config;
+        setCustomRegistry(customRegistries, function(err) {
+            if (err) return exit(err);
+            printMsg(['', '    set authorize info to registry ' + registry + ' success', '']);
+        });
+    }).catch(exit);
 }
 
 function onSetEmail(registry, value) {
-    var customRegistries = getCustomRegistry();
+    const customRegistries = getCustomRegistry();
     if (!customRegistries.hasOwnProperty(registry)) return;
-    var config = customRegistries[registry];
+    const config = customRegistries[registry];
     config.email = value;
-    setCustomRegistry(customRegistries, function(err) {
-        if (err) return exit(err);
-        printMsg(['', '    set email to registry ' + registry + ' success', '']);
-    });
+    new Promise(resolve => {
+        config[FIELD_IS_CURRENT] ? resolve(config(['email'], config)) : resolve();
+    }).then(() => {
+        customRegistries[registry] = config;
+        setCustomRegistry(customRegistries, function(err) {
+            if (err) return exit(err);
+            printMsg(['', '    set email to registry ' + registry + ' success', '']);
+        });
+    }).catch(exit);
 }
 
 function onSetRepository(registry, value) {
@@ -246,10 +263,14 @@ function onSetRepository(registry, value) {
     if (!customRegistries.hasOwnProperty(registry)) return;
     var config = customRegistries[registry];
     config[FIELD_REPOSITORY] = value;
-    setCustomRegistry(customRegistries, function(err) {
-        if (err) return exit(err);
-        printMsg(['', `    set ${FIELD_REPOSITORY} to registry [${registry}] success`, '']);
-    });
+    new Promise(resolve => {
+        config[FIELD_IS_CURRENT] ? resolve(config([FIELD_REPOSITORY], config)) : resolve();
+    }).then(() => {
+        setCustomRegistry(customRegistries, function(err) {
+            if (err) return exit(err);
+            printMsg(['', `    set ${FIELD_REPOSITORY} to registry [${registry}] success`, '']);
+        });
+    }).catch(exit);
 }
 
 function onHome(name, browser) {
@@ -265,7 +286,7 @@ function onHome(name, browser) {
 function onPublish(tarballOrFolder, cmd) {
     getCurrentRegistry(registry => {
         const customRegistries = getCustomRegistry();
-        var currentRegistry;
+        let currentRegistry;
         // find current using custom registry
         Object.keys(customRegistries).forEach(function(key) {
             const item = customRegistries[key];
@@ -288,9 +309,10 @@ function onPublish(tarballOrFolder, cmd) {
         new Promise((resolve, reject) => {
             if (currentRegistry) {
                 if (currentRegistry[FIELD_REPOSITORY]) {
-                    printMsg([ '',
-                    '   current registry is a custom registry, publish to custom repository.',
-                    '']);
+                    printMsg(['',
+                        '   current registry is a custom registry, publish to custom repository.',
+                        ''
+                    ]);
                     optionData.registry = currentRegistry[FIELD_REPOSITORY];
                     command += ` --registry ${currentRegistry[FIELD_REPOSITORY]}`;
                     Object.keys(optionData).forEach((key) => {
@@ -302,9 +324,10 @@ function onPublish(tarballOrFolder, cmd) {
                     reject(new Error(`   current using registry [${currentRegistry.name}] has no ${FIELD_REPOSITORY} field, can't execute publish.`));
                 }
             } else {
-                printMsg([ '',
-                '   current using registry is not a custom registry, will publish to npm official repository.',
-                '']);
+                printMsg(['',
+                    '   current using registry is not a custom registry, will publish to npm official repository.',
+                    ''
+                ]);
                 optionData.registry = registries.npm.registry;
                 // find current using registry
                 Object.keys(registries).forEach(function(key) {
@@ -320,15 +343,9 @@ function onPublish(tarballOrFolder, cmd) {
         }).then(() => {
             const callback = (err) => {
                 config(attrs, currentRegistry).then(() => {
-                    if (err) {
-                        exit(err);
-                    }
-                    printMsg([ '',
-                    `   published to registry ${currentRegistry[FIELD_REPOSITORY]} successfully.`,
-                    '']);
-                }).catch(err => {
-                    exit(err);
-                });
+                    err && exit(err);
+                    printMsg(['', `   published to registry ${currentRegistry[FIELD_REPOSITORY]} successfully.`, '']);
+                }).catch(exit);
             };
             try {
                 tarballOrFolder ? npm.publish(tarballOrFolder, callback) : npm.publish(callback);
