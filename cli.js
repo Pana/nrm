@@ -114,7 +114,7 @@ function onList() {
         Object.keys(allRegistries).forEach(function(key) {
             var item = allRegistries[key];
             var prefix = item.registry === cur ? '* ' : '  ';
-            info.push(prefix + key + line(key, 8) + item.registry);
+            info.push(prefix + key + line(key, 12) + item.registry);
         });
 
         info.push('');
