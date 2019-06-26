@@ -22,5 +22,9 @@
     "edunpm": {
         "home": "http://www.enpmjs.org",
         "registry": "http://registry.enpmjs.org/"
+    },
+    "huaweicloud": {
+        "home": "https://mirrors.huaweicloud.com/",
+        "registry": "https://mirrors.huaweicloud.com/repository/npm/"
     }
 }
