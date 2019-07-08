@@ -7,6 +7,10 @@
         "home": "https://yarnpkg.com",
         "registry": "https://registry.yarnpkg.com/"
     },
+    "tencent": {
+        "home": "https://mirrors.cloud.tencent.com/npm/",
+        "registry": "https://mirrors.cloud.tencent.com/npm/"
+    },
     "cnpm": {
         "home": "http://cnpmjs.org",
         "registry": "http://r.cnpmjs.org/"
