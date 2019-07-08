@@ -24,6 +24,7 @@ $ npm install -g nrm
 $ nrm ls
 
 * npm -----  https://registry.npmjs.org/
+  yarn ----- https://registry.yarnpkg.com
   cnpm ----  http://r.cnpmjs.org/
   taobao --  https://registry.npm.taobao.org/
   nj ------  https://registry.nodejitsu.com/
@@ -74,6 +75,7 @@ Usage: nrm [options] [command]
 ## Registries
 
 * [npm](https://www.npmjs.org)
+* [yarn](https://yarnpkg.com)
 * [cnpm](http://cnpmjs.org)
 * [nodejitsu](https://www.nodejitsu.com)
 * [taobao](http://npm.taobao.org/)
@@ -89,9 +91,9 @@ When you are using a custom registry you will need to run the `set-hosted-repo` 
 If you find nrm is useful and is a experienced node.js developer, then you can help maintain nrm.
 If you have the interest you can reach me through email: pana.wang@outlook.com
 
-## TODO
+## Contributors 
 
-* None
+* [EmilyMew](https://github.com/EmilyMew)
 
 ## LICENSE
 MIT
