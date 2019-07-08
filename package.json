@@ -1,6 +1,6 @@
 {
   "name": "nrm",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "NPM registry manager can help you easy and fast switch between different npm registries, now include: cnpm, taobao, nj(nodejitsu), edunpm",
   "bin": "./cli.js",
   "repository": {
@@ -28,7 +28,7 @@
     "node-echo": "^0.1.1",
     "npm": "latest",
     "only": "0.0.2",
-    "open": "0.0.5",
+    "open": ">=6.0.0",
     "request": "^2.72.0"
   }
 }
