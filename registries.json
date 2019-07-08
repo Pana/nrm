@@ -5,7 +5,7 @@
     },
     "yarn": {
         "home": "https://yarnpkg.com",
-        "registry": "https://registry.yarnpkg.com"
+        "registry": "https://registry.yarnpkg.com/"
     },
     "cnpm": {
         "home": "http://cnpmjs.org",
