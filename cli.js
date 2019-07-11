@@ -127,7 +127,7 @@ function showCurrent() {
         var allRegistries = getAllRegistry();
         Object.keys(allRegistries).forEach(function(key) {
             var item = allRegistries[key];
-            if (item.registry === cur) {
+            if (item[FIELD_IS_CURRENT]) {
                 printMsg([key]);
                 return;
             }
