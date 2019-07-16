@@ -314,7 +314,6 @@ function onPublish(tarballOrFolder, cmd) {
                         ''
                     ]);
                     optionData.registry = currentRegistry[FIELD_REPOSITORY];
-                    command += ` --registry ${currentRegistry[FIELD_REPOSITORY]}`;
                     Object.keys(optionData).forEach((key) => {
                         command += ` --${key} ${optionData[key]}`;
                     });
