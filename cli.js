@@ -11,6 +11,7 @@ const open = require('open');
 const async = require('async');
 const request = require('request');
 const only = require('only');
+const humps = require('humps');
 
 const registries = require('./registries.json');
 const PKG = require('./package.json');
@@ -48,7 +49,7 @@ program
     .action(onAdd);
 
 program
-    .command('set-auth <registry> [value]')
+    .command('set-auth <registryName> [value]')
     .option('-a, --always-auth', 'Set is always auth')
     .option('-u, --username <username>', 'Your user name for this registry')
     .option('-p, --password <password>', 'Your password for this registry')
@@ -56,7 +57,7 @@ program
     .action(onSetAuth);
 
 program
-    .command('set-email <registry> <value>')
+    .command('set-email <registryName> <value>')
     .description('Set email for a custom registry')
     .action(onSetEmail);
 
@@ -113,7 +114,7 @@ function onList() {
 
         Object.keys(allRegistries).forEach(function(key) {
             var item = allRegistries[key];
-            var prefix = item.registry === cur ? '* ' : '  ';
+            var prefix = item.registry.toLowerCase() === cur.toLowerCase() ? '* ' : '  ';
             info.push(prefix + key + line(key, 12) + item.registry);
         });
 
@@ -127,7 +128,7 @@ function showCurrent() {
         var allRegistries = getAllRegistry();
         Object.keys(allRegistries).forEach(function(key) {
             var item = allRegistries[key];
-            if (item[FIELD_IS_CURRENT]) {
+            if (item[FIELD_IS_CURRENT] || item.registry.toLowerCase() === cur.toLowerCase() ) {
                 printMsg([key]);
                 return;
             }
@@ -139,8 +140,11 @@ function config(attrArray, registry, index = 0) {
     return new Promise((resolve, reject) => {
         const attr = attrArray[index];
         const command = registry.hasOwnProperty(attr) ? ['set', attr, String(registry[attr])] : ['delete', attr];
-        npm.commands.config(command, function(err, data) {
-            return err ? reject(err) : resolve(index + 1);
+        npm.load(function(err){
+            if(err) return exit(err);
+            npm.commands.config(command, function(err, data) {
+                return err ? reject(err) : resolve(index + 1);
+            });
         });
     }).then(next => {
         if (next < attrArray.length) {
@@ -154,15 +158,23 @@ function config(attrArray, registry, index = 0) {
 function onUse(name) {
     var allRegistries = getAllRegistry();
     if (allRegistries.hasOwnProperty(name)) {
-        var registry = allRegistries[name];
-        npm.load(function(err) {
-            if (err) return exit(err);
-            const attrs = [].concat(REGISTRY_ATTRS);
-            for (let attr in registry) {
+        getCurrentRegistry(function(cur){ 
+            let currentRegistry,item;
+            for(let key of Object.keys(allRegistries)){
+                item = allRegistries[key];
+                if(item.registry.toLowerCase() === cur.toLowerCase()){
+                    currentRegistry = item;
+                    break;
+                }
+            }
+            var registry = allRegistries[name];
+            let attrs = [].concat(REGISTRY_ATTRS).concat();
+            for (let attr in Object.assign({},currentRegistry,registry)) {
                 if (!REGISTRY_ATTRS.includes(attr) && !IGNORED_ATTRS.includes(attr)) {
                     attrs.push(attr);
                 }
             }
+
             config(attrs, registry).then(() => {
                 console.log('                        ');
                 var newR = npm.config.get('registry');
@@ -215,45 +227,45 @@ function onAdd(name, url, home) {
     });
 }
 
-function onSetAuth(registry, value, cmd) {
+function onSetAuth(registryName, value, cmd) {
     const customRegistries = getCustomRegistry();
-    if (!customRegistries.hasOwnProperty(registry)) return;
-    const config = customRegistries[registry];
-    const attrs = [FIELD_AUTH];
+    if (!customRegistries.hasOwnProperty(registryName)) return;
+    const registry = customRegistries[registryName];
+    let attrs = [FIELD_AUTH];
     if (value) {
-        config[FIELD_AUTH] = value;
+        registry[FIELD_AUTH] = value;
     } else if (cmd.username && cmd.password) {
-        config[FIELD_AUTH] = new Buffer(`${cmd.username}:${cmd.password}`).toString('base64');
+        registry[FIELD_AUTH] = Buffer.from(`${cmd.username}:${cmd.password}`).toString('base64');
     } else {
         return exit(new Error('your username & password or auth value is required'));
     }
-    if (cmd[FIELD_ALWAYS_AUTH]) {
-        config[FIELD_ALWAYS_AUTH] = true;
+    if (cmd[humps.camelize(FIELD_ALWAYS_AUTH,{separator:'-'})]) {
+        registry[FIELD_ALWAYS_AUTH] = true;
         attrs.push(FIELD_ALWAYS_AUTH);
     }
     new Promise(resolve => {
-        config[FIELD_IS_CURRENT] ? resolve(config(attrs, config)) : resolve();
+        registry[FIELD_IS_CURRENT] ? resolve(config(attrs, registry)) : resolve();
     }).then(() => {
-        customRegistries[registry] = config;
+        customRegistries[registryName] = registry;
         setCustomRegistry(customRegistries, function(err) {
             if (err) return exit(err);
-            printMsg(['', '    set authorize info to registry ' + registry + ' success', '']);
+            printMsg(['', '    set authorize info to registry ' + registryName + ' success', '']);
         });
     }).catch(exit);
 }
 
-function onSetEmail(registry, value) {
+function onSetEmail(registryName, value) {
     const customRegistries = getCustomRegistry();
-    if (!customRegistries.hasOwnProperty(registry)) return;
-    const config = customRegistries[registry];
-    config.email = value;
+    if (!customRegistries.hasOwnProperty(registryName)) return;
+    const registry = customRegistries[registryName];
+    registry.email = value;
     new Promise(resolve => {
-        config[FIELD_IS_CURRENT] ? resolve(config(['email'], config)) : resolve();
+        registry[FIELD_IS_CURRENT] ? resolve(config(['email'], registry)) : resolve();
     }).then(() => {
-        customRegistries[registry] = config;
+        customRegistries[registryName] = registry;
         setCustomRegistry(customRegistries, function(err) {
             if (err) return exit(err);
-            printMsg(['', '    set email to registry ' + registry + ' success', '']);
+            printMsg(['', '    set email to registry ' + registryName + ' success', '']);
         });
     }).catch(exit);
 }
