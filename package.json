@@ -24,6 +24,7 @@
     "async": "^1.5.2",
     "commander": "^2.9.0",
     "extend": "^3.0.0",
+    "humps": "^2.0.1",
     "ini": "^1.1.0",
     "node-echo": "^0.1.1",
     "npm": "latest",
