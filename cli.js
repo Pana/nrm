@@ -83,7 +83,7 @@ program
     .action(onDel);
 
 program
-    .command('home [registry] [browser]')
+    .command('home <registry> [browser]')
     .description('Open the homepage of registry with optional browser')
     .action(onHome);
 
