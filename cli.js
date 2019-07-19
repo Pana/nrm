@@ -298,6 +298,7 @@ function onSetRepository(registry, value) {
 
 function onSet(registryName,cmd){
     if(!registryName || !cmd.attr || cmd.value === undefined) return;
+    if(IGNORED_ATTRS.includes(cmd.attr)) return ;
     var customRegistries = getCustomRegistry();
     if (!customRegistries.hasOwnProperty(registryName)) return;
     const registry = customRegistries[registryName];
