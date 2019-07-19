@@ -67,12 +67,23 @@ program
     .action(onSetRepository);
 
 program
+    .command('set <registryName>')
+    .option('-a,--attr <attr>','set custorm registry attribute')
+    .option('-v,--value <value>','set custorm registry value')
+    .description('Set custom registry attribute')
+    .action(onSet);
+program
+    .command('rename <registryName> <newName>')
+    .description('Set custom registry name')
+    .action(onRename);    
+
+program
     .command('del <registry>')
     .description('Delete one custom registry')
     .action(onDel);
 
 program
-    .command('home <registry> [browser]')
+    .command('home [registry] [browser]')
     .description('Open the homepage of registry with optional browser')
     .action(onHome);
 
@@ -285,6 +296,41 @@ function onSetRepository(registry, value) {
     }).catch(exit);
 }
 
+function onSet(registryName,cmd){
+    if(!registryName || !cmd.attr || cmd.value === undefined) return;
+    var customRegistries = getCustomRegistry();
+    if (!customRegistries.hasOwnProperty(registryName)) return;
+    const registry = customRegistries[registryName];
+    registry[cmd.attr] = cmd.value;
+    new Promise(resolve => {
+        registry[FIELD_IS_CURRENT] ? resolve(config([cmd.attr], registry)) : resolve();
+    }).then(() => {
+        customRegistries[registryName] = registry;
+        setCustomRegistry(customRegistries, function(err) {
+            if (err) return exit(err);
+            printMsg(['', `    set registry ${registryName} [${cmd.attr}=${cmd.value}] success`, '']);
+        });
+    }).catch(exit);
+}
+   
+function onRename(registryName,newName){
+    if(!newName || registryName === newName) return;
+    let customRegistries = getCustomRegistry();
+    if(!customRegistries.hasOwnProperty(registryName)){
+        console.log('Only custom registries can be modified');
+        return ;
+    }
+    if(registries[newName] || customRegistries[newName]){
+        console.log('The registry contains this new name');
+        return ;
+    }
+    customRegistries[newName] = JSON.parse(JSON.stringify(customRegistries[registryName]));
+    delete customRegistries[registryName];
+    setCustomRegistry(customRegistries, function(err) {
+        if (err) return exit(err);
+        printMsg(['', `    rename ${registryName} to ${newName} success`, '']);
+    });
+}
 function onHome(name, browser) {
     var allRegistries = getAllRegistry();
     var home = allRegistries[name] && allRegistries[name].home;
