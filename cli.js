@@ -16,6 +16,7 @@ const humps = require('humps');
 const registries = require('./registries.json');
 const PKG = require('./package.json');
 const NRMRC = path.join(process.env.HOME, '.nrmrc');
+const NPMRC = path.join(process.env.HOME, '.npmrc');
 
 const REGISTRY_ATTRS = [];
 const FIELD_AUTH = '_auth';
@@ -65,6 +66,16 @@ program
     .command('set-hosted-repo <registry> <value>')
     .description('Set hosted npm repository for a custom registry to publish packages')
     .action(onSetRepository);
+
+program
+    .command('set-scope <scopeName> <value>')
+    .description('Associating a scope with a registry')
+    .action(onSetScope);
+
+program
+    .command('del-scope <scopeName>')
+    .description('remove a scope')
+    .action(onDelScope);
 
 program
     .command('set <registryName>')
@@ -296,6 +307,22 @@ function onSetRepository(registry, value) {
     }).catch(exit);
 }
 
+function onSetScope(scopeName,value){
+    const npmrc = getNPMInfo();
+    const scopeRegistryKey = `${scopeName}:registry`
+    config([scopeRegistryKey],{[scopeRegistryKey]:value}).then(function(){
+        printMsg(['', `    set [ ${scopeRegistryKey}=${value} ] success`, '']);
+    }).catch(exit)
+}
+
+function onDelScope(scopeName){
+    const npmrc = getNPMInfo();
+    const scopeRegistryKey = `${scopeName}:registry`
+    npmrc[scopeRegistryKey] && config([scopeRegistryKey],{}).then(function(){
+        printMsg(['', `    delete [ ${scopeRegistryKey} ] success`, '']);
+    }).catch(exit)
+}
+
 function onSet(registryName,cmd){
     if(!registryName || !cmd.attr || cmd.value === undefined) return;
     if(IGNORED_ATTRS.includes(cmd.attr)) return ;
@@ -470,7 +497,7 @@ function getCurrentRegistry(cbk) {
 }
 
 function getCustomRegistry() {
-    return fs.existsSync(NRMRC) ? ini.parse(fs.readFileSync(NRMRC, 'utf-8')) : {};
+    return getINIInfo(NRMRC)
 }
 
 function setCustomRegistry(config, cbk) {
@@ -489,6 +516,15 @@ function printMsg(infos) {
     infos.forEach(function(info) {
         console.log(info);
     });
+}
+
+function getNPMInfo(){
+    return getINIInfo(NPMRC)
+}
+
+
+function getINIInfo(path){
+    return fs.existsSync(path) ? ini.parse(fs.readFileSync(path, 'utf-8')) : {};
 }
 
 /*
