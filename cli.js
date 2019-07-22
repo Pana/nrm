@@ -17,11 +17,14 @@ const registries = require('./registries.json');
 const PKG = require('./package.json');
 const NRMRC = path.join(process.env.HOME, '.nrmrc');
 
-const REGISTRY_ATTRS = [];
 const FIELD_AUTH = '_auth';
 const FIELD_ALWAYS_AUTH = 'always-auth';
 const FIELD_IS_CURRENT = 'is-current';
 const FIELD_REPOSITORY = 'repository';
+const FIELD_REGISTRY = 'registry';
+const FIELD_HOME = 'home';
+const FIELD_EMAIL = 'email';
+const REGISTRY_ATTRS = [FIELD_REGISTRY, FIELD_HOME, FIELD_AUTH, FIELD_ALWAYS_AUTH];
 const IGNORED_ATTRS = [FIELD_IS_CURRENT, FIELD_REPOSITORY];
 
 
@@ -49,17 +52,13 @@ program
     .action(onAdd);
 
 program
-    .command('set-auth <registryName> [value]')
+    .command('login <registryName> [value]')
     .option('-a, --always-auth', 'Set is always auth')
     .option('-u, --username <username>', 'Your user name for this registry')
     .option('-p, --password <password>', 'Your password for this registry')
+    .option('-e, --email <email>', 'Your email for this registry')
     .description('Set authorize information for a custom registry with a base64 encoded string or username and pasword')
-    .action(onSetAuth);
-
-program
-    .command('set-email <registryName> <value>')
-    .description('Set email for a custom registry')
-    .action(onSetEmail);
+    .action(onLogin);
 
 program
     .command('set-hosted-repo <registry> <value>')
@@ -111,11 +110,15 @@ function onList() {
     getCurrentRegistry(function(cur) {
         var info = [''];
         var allRegistries = getAllRegistry();
+        const keys = Object.keys(allRegistries);
+        const len = Math.max(...keys.map(key => key.length)) + 3;
 
         Object.keys(allRegistries).forEach(function(key) {
             var item = allRegistries[key];
-            var prefix = item.registry.toLowerCase() === cur.toLowerCase() ? '* ' : '  ';
-            info.push(prefix + key + line(key, 12) + item.registry);
+            console.log(cur);
+            console.log(item.registry);
+            var prefix = equalsIgnoreCase(item.registry, cur) && item[FIELD_IS_CURRENT] ? '* ' : '  ';
+            info.push(prefix + key + line(key, len) + item.registry);
         });
 
         info.push('');
@@ -128,7 +131,7 @@ function showCurrent() {
         var allRegistries = getAllRegistry();
         Object.keys(allRegistries).forEach(function(key) {
             var item = allRegistries[key];
-            if (item[FIELD_IS_CURRENT] || item.registry.toLowerCase() === cur.toLowerCase() ) {
+            if (item[FIELD_IS_CURRENT] && equalsIgnoreCase(item.registry, cur)) {
                 printMsg([key]);
                 return;
             }
@@ -140,8 +143,8 @@ function config(attrArray, registry, index = 0) {
     return new Promise((resolve, reject) => {
         const attr = attrArray[index];
         const command = registry.hasOwnProperty(attr) ? ['set', attr, String(registry[attr])] : ['delete', attr];
-        npm.load(function(err){
-            if(err) return exit(err);
+        npm.load(function(err) {
+            if (err) return reject(err);
             npm.commands.config(command, function(err, data) {
                 return err ? reject(err) : resolve(index + 1);
             });
@@ -158,18 +161,18 @@ function config(attrArray, registry, index = 0) {
 function onUse(name) {
     var allRegistries = getAllRegistry();
     if (allRegistries.hasOwnProperty(name)) {
-        getCurrentRegistry(function(cur){ 
-            let currentRegistry,item;
-            for(let key of Object.keys(allRegistries)){
+        getCurrentRegistry(function(cur) {
+            let currentRegistry, item;
+            for (let key of Object.keys(allRegistries)) {
                 item = allRegistries[key];
-                if(item.registry.toLowerCase() === cur.toLowerCase()){
+                if (item[FIELD_IS_CURRENT] && equalsIgnoreCase(item.registry, cur)) {
                     currentRegistry = item;
                     break;
                 }
             }
             var registry = allRegistries[name];
             let attrs = [].concat(REGISTRY_ATTRS).concat();
-            for (let attr in Object.assign({},currentRegistry,registry)) {
+            for (let attr in Object.assign({}, currentRegistry, registry)) {
                 if (!REGISTRY_ATTRS.includes(attr) && !IGNORED_ATTRS.includes(attr)) {
                     attrs.push(attr);
                 }
@@ -177,12 +180,12 @@ function onUse(name) {
 
             config(attrs, registry).then(() => {
                 console.log('                        ');
-                var newR = npm.config.get('registry');
+                const newR = npm.config.get(FIELD_REGISTRY);
                 var customRegistries = getCustomRegistry();
                 Object.keys(customRegistries).forEach(key => {
                     delete customRegistries[key][FIELD_IS_CURRENT];
                 });
-                if (customRegistries.hasOwnProperty(name) && customRegistries[name].registry === registry.registry) {
+                if (customRegistries.hasOwnProperty(name) && (name in registries || customRegistries[name].registry === registry.registry)) {
                     registry[FIELD_IS_CURRENT] = true;
                     customRegistries[name] = registry;
                 }
@@ -201,7 +204,7 @@ function onDel(name) {
     var customRegistries = getCustomRegistry();
     if (!customRegistries.hasOwnProperty(name)) return;
     getCurrentRegistry(function(cur) {
-        if (cur === customRegistries[name].registry) {
+        if (equalsIgnoreCase(customRegistries[name].registry, cur)) {
             onUse('npm');
         }
         delete customRegistries[name];
@@ -227,7 +230,7 @@ function onAdd(name, url, home) {
     });
 }
 
-function onSetAuth(registryName, value, cmd) {
+function onLogin(registryName, value, cmd) {
     const customRegistries = getCustomRegistry();
     if (!customRegistries.hasOwnProperty(registryName)) return;
     const registry = customRegistries[registryName];
@@ -239,9 +242,13 @@ function onSetAuth(registryName, value, cmd) {
     } else {
         return exit(new Error('your username & password or auth value is required'));
     }
-    if (cmd[humps.camelize(FIELD_ALWAYS_AUTH,{separator:'-'})]) {
+    if (cmd[humps.camelize(FIELD_ALWAYS_AUTH, { separator: '-' })]) {
         registry[FIELD_ALWAYS_AUTH] = true;
         attrs.push(FIELD_ALWAYS_AUTH);
+    }
+    if (cmd.email) {
+        registry.email = cmd.email;
+        attrs.push(FIELD_EMAIL);
     }
     new Promise(resolve => {
         registry[FIELD_IS_CURRENT] ? resolve(config(attrs, registry)) : resolve();
@@ -250,22 +257,6 @@ function onSetAuth(registryName, value, cmd) {
         setCustomRegistry(customRegistries, function(err) {
             if (err) return exit(err);
             printMsg(['', '    set authorize info to registry ' + registryName + ' success', '']);
-        });
-    }).catch(exit);
-}
-
-function onSetEmail(registryName, value) {
-    const customRegistries = getCustomRegistry();
-    if (!customRegistries.hasOwnProperty(registryName)) return;
-    const registry = customRegistries[registryName];
-    registry.email = value;
-    new Promise(resolve => {
-        registry[FIELD_IS_CURRENT] ? resolve(config(['email'], registry)) : resolve();
-    }).then(() => {
-        customRegistries[registryName] = registry;
-        setCustomRegistry(customRegistries, function(err) {
-            if (err) return exit(err);
-            printMsg(['', '    set email to registry ' + registryName + ' success', '']);
         });
     }).catch(exit);
 }
@@ -302,12 +293,12 @@ function onPublish(tarballOrFolder, cmd) {
         // find current using custom registry
         Object.keys(customRegistries).forEach(function(key) {
             const item = customRegistries[key];
-            if (item.registry === registry && item['is-current']) {
+            if (item[FIELD_IS_CURRENT] && equalsIgnoreCase(item.registry, registry)) {
                 currentRegistry = item;
                 currentRegistry.name = key;
             }
         });
-        const attrs = ['registry'];
+        const attrs = [FIELD_REGISTRY];
         let command = '> npm publish';
         const optionData = {};
         cmd.options.forEach(option => {
@@ -418,7 +409,7 @@ function onTest(registry) {
 function getCurrentRegistry(cbk) {
     npm.load(function(err, conf) {
         if (err) return exit(err);
-        cbk(npm.config.get('registry'));
+        cbk(npm.config.get(FIELD_REGISTRY));
     });
 }
 
@@ -427,11 +418,24 @@ function getCustomRegistry() {
 }
 
 function setCustomRegistry(config, cbk) {
+    for (let name in config) {
+        if (name in registries) {
+            delete config[name].registry;
+            delete config[name].home;
+        }
+    }
     echo(ini.stringify(config), '>', NRMRC, cbk);
 }
 
 function getAllRegistry() {
-    return extend({}, registries, getCustomRegistry());
+    const custom = getCustomRegistry();
+    const all = extend({}, registries, custom);
+    for (let name in registries) {
+        if (name in custom) {
+            all[name] = extend({}, custom[name], registries[name]);
+        }
+    }
+    return all;
 }
 
 function printErr(err) {
@@ -455,4 +459,18 @@ function exit(err) {
 function line(str, len) {
     var line = new Array(Math.max(1, len - str.length)).join('-');
     return ' ' + line + ' ';
+}
+
+/**
+ * compare ignore case
+ * 
+ * @param {string} str1 
+ * @param {string} str2 
+ */
+function equalsIgnoreCase(str1, str2) {
+    if (str1 && str2) {
+        return str1.toLowerCase() === str2.toLowerCase();
+    } else {
+        return !str1 && !str2;
+    }
 }

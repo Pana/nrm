@@ -50,11 +50,11 @@ Usage: nrm [options] [command]
     current                               Show current registry name
     use <registry>                        Change registry to registry
     add <registry> <url> [home]           Add one custom registry
-    set-auth <registry> [value]           Set authorize information for a custom registry with a base64 encoded string or username and pasword
+    login <registry> [value]              Set authorize information for a registry with a base64 encoded string or username and pasword
       -a  --always-auth                     Set is always auth
       -u  --username <username>             Your user name for this registry
       -p  --password <password>             Your password for this registry
-    set-email <registry> <value>          Set email for a custom registry
+      -e  --email <email>                   Your email for this registry
     set-hosted-repo <registry> <value>    Set hosted npm repository for a custom registry to publish packages
     del <registry>                        Delete one custom registry
     home <registry> [browser]             Open the homepage of registry with optional browser
