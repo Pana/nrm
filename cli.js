@@ -16,6 +16,7 @@ const humps = require('humps');
 const registries = require('./registries.json');
 const PKG = require('./package.json');
 const NRMRC = path.join(process.env.HOME, '.nrmrc');
+const NPMRC = path.join(process.env.HOME, '.npmrc');
 
 const FIELD_AUTH = '_auth';
 const FIELD_ALWAYS_AUTH = 'always-auth';
@@ -64,6 +65,27 @@ program
     .command('set-hosted-repo <registry> <value>')
     .description('Set hosted npm repository for a custom registry to publish packages')
     .action(onSetRepository);
+
+program
+    .command('set-scope <scopeName> <value>')
+    .description('Associating a scope with a registry')
+    .action(onSetScope);
+
+program
+    .command('del-scope <scopeName>')
+    .description('remove a scope')
+    .action(onDelScope);
+
+program
+    .command('set <registryName>')
+    .option('-a,--attr <attr>','set custorm registry attribute')
+    .option('-v,--value <value>','set custorm registry value')
+    .description('Set custom registry attribute')
+    .action(onSet);
+program
+    .command('rename <registryName> <newName>')
+    .description('Set custom registry name')
+    .action(onRename);    
 
 program
     .command('del <registry>')
@@ -276,6 +298,58 @@ function onSetRepository(registry, value) {
     }).catch(exit);
 }
 
+function onSetScope(scopeName,value){
+    const npmrc = getNPMInfo();
+    const scopeRegistryKey = `${scopeName}:registry`
+    config([scopeRegistryKey],{[scopeRegistryKey]:value}).then(function(){
+        printMsg(['', `    set [ ${scopeRegistryKey}=${value} ] success`, '']);
+    }).catch(exit)
+}
+
+function onDelScope(scopeName){
+    const npmrc = getNPMInfo();
+    const scopeRegistryKey = `${scopeName}:registry`
+    npmrc[scopeRegistryKey] && config([scopeRegistryKey],{}).then(function(){
+        printMsg(['', `    delete [ ${scopeRegistryKey} ] success`, '']);
+    }).catch(exit)
+}
+
+function onSet(registryName,cmd){
+    if(!registryName || !cmd.attr || cmd.value === undefined) return;
+    if(IGNORED_ATTRS.includes(cmd.attr)) return ;
+    var customRegistries = getCustomRegistry();
+    if (!customRegistries.hasOwnProperty(registryName)) return;
+    const registry = customRegistries[registryName];
+    registry[cmd.attr] = cmd.value;
+    new Promise(resolve => {
+        registry[FIELD_IS_CURRENT] ? resolve(config([cmd.attr], registry)) : resolve();
+    }).then(() => {
+        customRegistries[registryName] = registry;
+        setCustomRegistry(customRegistries, function(err) {
+            if (err) return exit(err);
+            printMsg(['', `    set registry ${registryName} [${cmd.attr}=${cmd.value}] success`, '']);
+        });
+    }).catch(exit);
+}
+   
+function onRename(registryName,newName){
+    if(!newName || registryName === newName) return;
+    let customRegistries = getCustomRegistry();
+    if(!customRegistries.hasOwnProperty(registryName)){
+        console.log('Only custom registries can be modified');
+        return ;
+    }
+    if(registries[newName] || customRegistries[newName]){
+        console.log('The registry contains this new name');
+        return ;
+    }
+    customRegistries[newName] = JSON.parse(JSON.stringify(customRegistries[registryName]));
+    delete customRegistries[registryName];
+    setCustomRegistry(customRegistries, function(err) {
+        if (err) return exit(err);
+        printMsg(['', `    rename ${registryName} to ${newName} success`, '']);
+    });
+}
 function onHome(name, browser) {
     var allRegistries = getAllRegistry();
     var home = allRegistries[name] && allRegistries[name].home;
@@ -414,7 +488,7 @@ function getCurrentRegistry(cbk) {
 }
 
 function getCustomRegistry() {
-    return fs.existsSync(NRMRC) ? ini.parse(fs.readFileSync(NRMRC, 'utf-8')) : {};
+    return getINIInfo(NRMRC)
 }
 
 function setCustomRegistry(config, cbk) {
@@ -446,6 +520,15 @@ function printMsg(infos) {
     infos.forEach(function(info) {
         console.log(info);
     });
+}
+
+function getNPMInfo(){
+    return getINIInfo(NPMRC)
+}
+
+
+function getINIInfo(path){
+    return fs.existsSync(path) ? ini.parse(fs.readFileSync(path, 'utf-8')) : {};
 }
 
 /*
