@@ -137,8 +137,6 @@ function onList() {
 
         Object.keys(allRegistries).forEach(function(key) {
             var item = allRegistries[key];
-            console.log(cur);
-            console.log(item.registry);
             var prefix = equalsIgnoreCase(item.registry, cur) && item[FIELD_IS_CURRENT] ? '* ' : '  ';
             info.push(prefix + key + line(key, len) + item.registry);
         });
