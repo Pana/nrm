@@ -113,7 +113,7 @@ program
 
 program
     .command('help', { isDefault: true })
-    .description('Print this help')
+    .description('Print this help \n if you want to clear the NRM configuration when uninstall you can execute "npm uninstall nrm -g -C or npm uninstall nrm -g --clean"')
     .action(function() {
         program.outputHelp();
     });
@@ -554,4 +554,16 @@ function equalsIgnoreCase(str1, str2) {
     } else {
         return !str1 && !str2;
     }
+}
+
+function cleanRegistry(){
+    setCustomRegistry('',function(err){
+        if (err) exit(err);
+        onUse('npm')
+    })
+}
+
+module.exports = {
+    cleanRegistry,
+    errExit: exit
 }
