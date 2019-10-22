@@ -5,7 +5,6 @@ const fs = require('fs');
 const program = require('commander');
 const npm = require('npm');
 const ini = require('ini');
-const echo = require('node-echo');
 const extend = require('extend');
 const open = require('open');
 const async = require('async');
@@ -499,7 +498,7 @@ function setCustomRegistry (config, cbk) {
             delete config[name].home;
         }
     }
-    echo(ini.stringify(config), '>', NRMRC, cbk);
+    fs.writeFile(NRMRC, ini.stringify(config), cbk)
 }
 
 function getAllRegistry () {
