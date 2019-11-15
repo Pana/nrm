@@ -24,7 +24,7 @@ const FIELD_REPOSITORY = 'repository';
 const FIELD_REGISTRY = 'registry';
 const FIELD_HOME = 'home';
 const FIELD_EMAIL = 'email';
-const FIELD_SHOW_URL = "show-url"
+const FIELD_SHOW_URL = "show-url";
 const REGISTRY_ATTRS = [FIELD_REGISTRY, FIELD_HOME, FIELD_AUTH, FIELD_ALWAYS_AUTH];
 const IGNORED_ATTRS = [FIELD_IS_CURRENT, FIELD_REPOSITORY];
 
@@ -138,7 +138,7 @@ function onList () {
 
         Object.keys(allRegistries).forEach(function (key) {
             var item = allRegistries[key];
-            var prefix = equalsIgnoreCase(item.registry, cur) && item[FIELD_IS_CURRENT] ? '* ' : '  ';
+            var prefix = equalsIgnoreCase(item.registry, cur) || item[FIELD_IS_CURRENT] ? '* ' : '  ';
             info.push(prefix + key + line(key, len) + item.registry);
         });
 
@@ -152,8 +152,8 @@ function showCurrent (cmd) {
         var allRegistries = getAllRegistry();
         Object.keys(allRegistries).forEach(function (key) {
             var item = allRegistries[key];
-            if (item[FIELD_IS_CURRENT] && equalsIgnoreCase(item.registry, cur)) {
-                const showUrl = cmd[humps.camelize(FIELD_SHOW_URL, { separator: '-' })];
+            if (item[FIELD_IS_CURRENT] || equalsIgnoreCase(item.registry, cur)) {
+                const showUrl = cmd[humps.camelize(FIELD_SHOW_URL)];
                 printMsg([showUrl ? item.registry : key]);
                 return;
             }
@@ -240,6 +240,11 @@ function onDel (name) {
 function onAdd (name, url, home) {
     var customRegistries = getCustomRegistry();
     if (customRegistries.hasOwnProperty(name)) return;
+    // custom should not be in the non-custom registryList
+    if (name in registries) {
+        console.log(`${name} has been in the registry!`);
+        return;
+    }
     var config = customRegistries[name] = {};
     if (url[url.length - 1] !== '/') url += '/'; // ensure url end with /
     config.registry = url;
@@ -264,7 +269,7 @@ function onLogin (registryName, value, cmd) {
     } else {
         return exit(new Error('your username & password or auth value is required'));
     }
-    if (cmd[humps.camelize(FIELD_ALWAYS_AUTH, { separator: '-' })]) {
+    if (cmd[humps.camelize(FIELD_ALWAYS_AUTH)]) {
         registry[FIELD_ALWAYS_AUTH] = true;
         attrs.push(FIELD_ALWAYS_AUTH);
     }
@@ -300,10 +305,10 @@ function onSetRepository (registry, value) {
 
 function onSetScope (scopeName, value) {
     const npmrc = getNPMInfo();
-    const scopeRegistryKey = `${scopeName}:registry`
+    const scopeRegistryKey = `${scopeName}:registry`;
     config([scopeRegistryKey], { [scopeRegistryKey]: value }).then(function () {
         printMsg(['', `    set [ ${scopeRegistryKey}=${value} ] success`, '']);
-    }).catch(exit)
+    }).catch(exit);
 }
 
 function onDelScope (scopeName) {
@@ -488,7 +493,7 @@ function getCurrentRegistry (cbk) {
 }
 
 function getCustomRegistry () {
-    return getINIInfo(NRMRC)
+    return getINIInfo(NRMRC);
 }
 
 function setCustomRegistry (config, cbk) {
@@ -498,7 +503,7 @@ function setCustomRegistry (config, cbk) {
             delete config[name].home;
         }
     }
-    fs.writeFile(NRMRC, ini.stringify(config), cbk)
+    fs.writeFile(NRMRC, ini.stringify(config), cbk);
 }
 
 function getAllRegistry () {
