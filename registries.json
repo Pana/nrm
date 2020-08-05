@@ -12,8 +12,8 @@
         "registry": "https://mirrors.cloud.tencent.com/npm/"
     },
     "cnpm": {
-        "home": "http://cnpmjs.org",
-        "registry": "http://r.cnpmjs.org/"
+        "home": "https://cnpmjs.org",
+        "registry": "https://r.cnpmjs.org/"
     },
     "taobao": {
         "home": "https://npm.taobao.org",
