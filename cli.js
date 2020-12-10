@@ -528,7 +528,7 @@ function getNPMInfo () {
 
 
 function getINIInfo (path) {
-    return fs.existsSync(path) ? ini.parse(fs.readFileSync(path, 'utf-8')) : {};
+    return fs.existsSync(path) ? JSON.parse(JSON.stringify(ini.parse(fs.readFileSync(NRMRC, 'utf-8')))) : {};
 }
 
 /*
