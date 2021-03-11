@@ -15,7 +15,6 @@ const humps = require('humps');
 const registries = require('./registries.json');
 const PKG = require('./package.json');
 const NRMRC = path.join(process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'], '.nrmrc');
-const NPMRC = path.join(process.env.HOME, '.npmrc');
 
 const FIELD_AUTH = '_auth';
 const FIELD_ALWAYS_AUTH = 'always-auth';
