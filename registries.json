@@ -26,9 +26,5 @@
     "npmMirror": {
         "home": "https://skimdb.npmjs.com/",
         "registry": "https://skimdb.npmjs.com/registry/"
-    },
-    "edunpm": {
-        "home": "http://www.enpmjs.org",
-        "registry": "http://registry.enpmjs.org/"
     }
 }

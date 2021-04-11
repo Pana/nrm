@@ -11,6 +11,7 @@ pids
 logs
 results
 
+.vscode
 npm-debug.log
 node_modules
 TODO.md

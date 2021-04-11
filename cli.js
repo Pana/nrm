@@ -138,7 +138,7 @@ function onList () {
 
         Object.keys(allRegistries).forEach(function (key) {
             var item = allRegistries[key];
-            var prefix = equalsIgnoreCase(item.registry, cur) && item[FIELD_IS_CURRENT] ? '* ' : '  ';
+            var prefix = item[FIELD_IS_CURRENT] && equalsIgnoreCase(item.registry, cur) ? '* ' : '  ';
             info.push(prefix + key + line(key, len) + item.registry);
         });
 
@@ -150,9 +150,10 @@ function onList () {
 function showCurrent (cmd) {
     getCurrentRegistry(function (cur) {
         var allRegistries = getAllRegistry();
+        var customRegistries = getCustomRegistry();
         Object.keys(allRegistries).forEach(function (key) {
             var item = allRegistries[key];
-            if (item[FIELD_IS_CURRENT] && equalsIgnoreCase(item.registry, cur)) {
+            if (equalsIgnoreCase(item.registry, cur) && (customRegistries[key] || item[FIELD_IS_CURRENT])) {
                 const showUrl = cmd[humps.camelize(FIELD_SHOW_URL, { separator: '-' })];
                 printMsg([showUrl ? item.registry : key]);
                 return;
@@ -164,7 +165,7 @@ function showCurrent (cmd) {
 function config (attrArray, registry, index = 0) {
     return new Promise((resolve, reject) => {
         const attr = attrArray[index];
-        const command = registry.hasOwnProperty(attr) ? ['set', attr, String(registry[attr])] : ['delete', attr];
+        const command = hasOwnProperty(registry, attr) ? ['set', attr, String(registry[attr])] : ['delete', attr];
         npm.load(function (err) {
             if (err) return reject(err);
             npm.commands.config(command, function (err, data) {
@@ -182,7 +183,7 @@ function config (attrArray, registry, index = 0) {
 
 function onUse (name) {
     var allRegistries = getAllRegistry();
-    if (allRegistries.hasOwnProperty(name)) {
+    if (hasOwnProperty(allRegistries, name)) {
         getCurrentRegistry(function (cur) {
             let currentRegistry, item;
             for (let key of Object.keys(allRegistries)) {
@@ -207,7 +208,7 @@ function onUse (name) {
                 Object.keys(customRegistries).forEach(key => {
                     delete customRegistries[key][FIELD_IS_CURRENT];
                 });
-                if (customRegistries.hasOwnProperty(name) && (name in registries || customRegistries[name].registry === registry.registry)) {
+                if (hasOwnProperty(customRegistries, name) && (name in registries || customRegistries[name].registry === registry.registry)) {
                     registry[FIELD_IS_CURRENT] = true;
                     customRegistries[name] = registry;
                 }
@@ -224,9 +225,9 @@ function onUse (name) {
 
 function onDel (name) {
     var customRegistries = getCustomRegistry();
-    if (!customRegistries.hasOwnProperty(name)) return;
+    if (!hasOwnProperty(customRegistries, name)) return;
     getCurrentRegistry(function (cur) {
-        if (equalsIgnoreCase(customRegistries[name].registry, cur)) {
+        if (customRegistries[FIELD_IS_CURRENT] && equalsIgnoreCase(customRegistries[name].registry, cur)) {
             onUse('npm');
         }
         delete customRegistries[name];
@@ -239,7 +240,7 @@ function onDel (name) {
 
 function onAdd (name, url, home) {
     var customRegistries = getCustomRegistry();
-    if (customRegistries.hasOwnProperty(name)) return;
+    if (hasOwnProperty(customRegistries, name)) return;
     var config = customRegistries[name] = {};
     if (url[url.length - 1] !== '/') url += '/'; // ensure url end with /
     config.registry = url;
@@ -254,7 +255,7 @@ function onAdd (name, url, home) {
 
 function onLogin (registryName, value, cmd) {
     const customRegistries = getCustomRegistry();
-    if (!customRegistries.hasOwnProperty(registryName)) return;
+    if (!hasOwnProperty(customRegistries, registryName)) return;
     const registry = customRegistries[registryName];
     let attrs = [FIELD_AUTH];
     if (value) {
@@ -285,7 +286,7 @@ function onLogin (registryName, value, cmd) {
 
 function onSetRepository (registry, value) {
     var customRegistries = getCustomRegistry();
-    if (!customRegistries.hasOwnProperty(registry)) return;
+    if (!hasOwnProperty(customRegistries, registry)) return;
     var config = customRegistries[registry];
     config[FIELD_REPOSITORY] = value;
     new Promise(resolve => {
@@ -301,7 +302,9 @@ function onSetRepository (registry, value) {
 function onSetScope (scopeName, value) {
     const npmrc = getNPMInfo();
     const scopeRegistryKey = `${scopeName}:registry`
-    config([scopeRegistryKey], { [scopeRegistryKey]: value }).then(function () {
+    config([scopeRegistryKey], {
+        [scopeRegistryKey]: value
+    }).then(function () {
         printMsg(['', `    set [ ${scopeRegistryKey}=${value} ] success`, '']);
     }).catch(exit)
 }
@@ -318,7 +321,7 @@ function onSet (registryName, cmd) {
     if (!registryName || !cmd.attr || cmd.value === undefined) return;
     if (IGNORED_ATTRS.includes(cmd.attr)) return;
     var customRegistries = getCustomRegistry();
-    if (!customRegistries.hasOwnProperty(registryName)) return;
+    if (!hasOwnProperty(customRegistries, registryName)) return;
     const registry = customRegistries[registryName];
     registry[cmd.attr] = cmd.value;
     new Promise(resolve => {
@@ -335,7 +338,7 @@ function onSet (registryName, cmd) {
 function onRename (registryName, newName) {
     if (!newName || registryName === newName) return;
     let customRegistries = getCustomRegistry();
-    if (!customRegistries.hasOwnProperty(registryName)) {
+    if (!hasOwnProperty(customRegistries, registryName)) {
         console.log('Only custom registries can be modified');
         return;
     }
@@ -350,6 +353,7 @@ function onRename (registryName, newName) {
         printMsg(['', `    rename ${registryName} to ${newName} success`, '']);
     });
 }
+
 function onHome (name, browser) {
     var allRegistries = getAllRegistry();
     var home = allRegistries[name] && allRegistries[name].home;
@@ -440,7 +444,7 @@ function onTest (registry) {
     var toTest;
 
     if (registry) {
-        if (!allRegistries.hasOwnProperty(registry)) {
+        if (!hasOwnProperty(allRegistries, registry)) {
             return;
         }
         toTest = only(allRegistries, registry);
@@ -563,6 +567,10 @@ function cleanRegistry () {
         if (err) exit(err);
         onUse('npm')
     })
+}
+
+function hasOwnProperty (object, property) {
+    return Object.prototype.hasOwnProperty.call(object, property);
 }
 
 module.exports = {
