@@ -69,7 +69,7 @@ Usage: nrm [options] [command]
       -t  --tag [tag]                        Add tag
       -a  --access <public|restricted>       Set access
       -o  --otp [otpcode]                    Set otpcode
-      -dr --dry-run                         Set is dry run
+      -dr --dry-run                          Set is dry run
     test [registry]                       Show the response time for one or all registries
     help                                  Print this help
 
