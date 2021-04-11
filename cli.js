@@ -74,13 +74,13 @@ program
 
 program
     .command('del-scope <scopeName>')
-    .description('remove a scope')
+    .description('Remove a scope')
     .action(onDelScope);
 
 program
     .command('set <registryName>')
-    .option('-a,--attr <attr>', 'set custorm registry attribute')
-    .option('-v,--value <value>', 'set custorm registry value')
+    .option('-a,--attr <attr>', 'Set custorm registry attribute')
+    .option('-v,--value <value>', 'Set custorm registry value')
     .description('Set custom registry attribute')
     .action(onSet);
 program
@@ -547,7 +547,7 @@ function exit (err) {
 }
 
 function line (str, len) {
-    var line = new Array(Math.max(1, len - str.length)).join('-');
+    var line = new Array(Math.max(2, len - str.length + 2)).join('-');
     return ' ' + line + ' ';
 }
 

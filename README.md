@@ -23,12 +23,13 @@ $ npm install -g nrm
 ```
 $ nrm ls
 
-* npm -----  https://registry.npmjs.org/
-  yarn ----- https://registry.yarnpkg.com
-  cnpm ----  http://r.cnpmjs.org/
-  taobao --  https://registry.npm.taobao.org/
-  nj ------  https://registry.nodejitsu.com/
-  skimdb -- https://skimdb.npmjs.com/registry
+* npm ------- https://registry.npmjs.org/
+  yarn ------ https://registry.yarnpkg.com
+  tencent --- https://mirrors.cloud.tencent.com/npm/
+  cnpm ------ http://r.cnpmjs.org/
+  taobao ---- https://registry.npm.taobao.org/
+  nj -------- https://registry.nodejitsu.com/
+  skimdb ---- https://skimdb.npmjs.com/registry
 
 ```
 
@@ -56,20 +57,26 @@ Usage: nrm [options] [command]
       -p  --password <password>             Your password for this registry
       -e  --email <email>                   Your email for this registry
     set-hosted-repo <registry> <value>    Set hosted npm repository for a custom registry to publish packages
+    set-scope <scopeName> <value>         Associating a scope with a registry
+    del-scope <scopeName>                 Remove a scope
+    set <registryName>                    Set custom registry attribute
+      -a  --attr <attr>                    Set custorm registry attribute
+      -v  --value <value>                  Set custorm registry value
     del <registry>                        Delete one custom registry
+    rename <registryName> <newName>       Set custom registry name
     home <registry> [browser]             Open the homepage of registry with optional browser
-    test [registry]                       Show the response time for one or all registries
-    publish [<tarball>|<folder>]          Publish package to current registry if current registry is a custom registry.  if you\'re not using custom registry, this command will run npm publish directly
-      -t --tag [tag]                        Add tag
-      -a --access <public|restricted>       Set access
-      -o --otp [otpcode]                    Set otpcode
+    publish [<tarball>|<folder>]          Publish package to current registry if current registry is a custom registry. The field 'repository' of current custom registry is required running this command. If you're not using custom registry, this command will run npm publish directly
+      -t  --tag [tag]                        Add tag
+      -a  --access <public|restricted>       Set access
+      -o  --otp [otpcode]                    Set otpcode
       -dr --dry-run                         Set is dry run
+    test [registry]                       Show the response time for one or all registries
     help                                  Print this help
 
   Options:
 
-    -h, --help     output usage information
-    -V, --version  output the version number
+    -h  --help     output usage information
+    -V  --version  output the version number
 ```
 
 ## Registries
