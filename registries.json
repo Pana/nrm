@@ -17,7 +17,7 @@
     },
     "taobao": {
         "home": "https://npm.taobao.org",
-        "registry": "https://registry.npm.taobao.org/"
+        "registry": "https://registry.nlark.com/"
     },
     "nj": {
         "home": "https://www.nodejitsu.com",
