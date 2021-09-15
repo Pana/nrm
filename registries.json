@@ -19,10 +19,6 @@
         "home": "https://npm.taobao.org",
         "registry": "https://registry.nlark.com/"
     },
-    "nj": {
-        "home": "https://www.nodejitsu.com",
-        "registry": "https://registry.nodejitsu.com/"
-    },
     "npmMirror": {
         "home": "https://skimdb.npmjs.com/",
         "registry": "https://skimdb.npmjs.com/registry/"
