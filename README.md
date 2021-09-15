@@ -23,13 +23,12 @@ $ npm install -g nrm
 ```
 $ nrm ls
 
-* npm ------- https://registry.npmjs.org/
-  yarn ------ https://registry.yarnpkg.com
-  tencent --- https://mirrors.cloud.tencent.com/npm/
-  cnpm ------ http://r.cnpmjs.org/
-  taobao ---- https://registry.npm.taobao.org/
-  nj -------- https://registry.nodejitsu.com/
-  skimdb ---- https://skimdb.npmjs.com/registry
+* npm ---------- https://registry.npmjs.org/
+  yarn --------- https://registry.yarnpkg.com/
+  tencent ------ https://mirrors.cloud.tencent.com/npm/
+  cnpm --------- https://r.cnpmjs.org/
+  taobao ------- https://registry.nlark.com/
+  npmMirror ---- https://skimdb.npmjs.com/registry/
 
 ```
 
