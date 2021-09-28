@@ -17,7 +17,7 @@
     },
     "taobao": {
         "home": "https://npm.taobao.org",
-        "registry": "https://registry.nlark.com/"
+        "registry": "https://registry.npmmirror.com/"
     },
     "npmMirror": {
         "home": "https://skimdb.npmjs.com/",
