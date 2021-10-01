@@ -138,7 +138,7 @@ function onList () {
 
         Object.keys(allRegistries).forEach(function (key) {
             var item = allRegistries[key];
-            var prefix = item[FIELD_IS_CURRENT] && equalsIgnoreCase(item.registry, cur) ? '* ' : '  ';
+            var prefix = item[FIELD_IS_CURRENT] || equalsIgnoreCase(item.registry, cur) ? '* ' : '  ';
             info.push(prefix + key + line(key, len) + item.registry);
         });
 
@@ -150,10 +150,9 @@ function onList () {
 function showCurrent (cmd) {
     getCurrentRegistry(function (cur) {
         var allRegistries = getAllRegistry();
-        var customRegistries = getCustomRegistry();
         Object.keys(allRegistries).forEach(function (key) {
             var item = allRegistries[key];
-            if (equalsIgnoreCase(item.registry, cur) && (customRegistries[key] || item[FIELD_IS_CURRENT])) {
+            if (equalsIgnoreCase(item.registry, cur) || item[FIELD_IS_CURRENT]) {
                 const showUrl = cmd[humps.camelize(FIELD_SHOW_URL)];
                 printMsg([showUrl ? item.registry : key]);
                 return;
