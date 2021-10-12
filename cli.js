@@ -208,10 +208,8 @@ function onUse (name) {
                 Object.keys(customRegistries).forEach(key => {
                     delete customRegistries[key][FIELD_IS_CURRENT];
                 });
-                if (hasOwnProperty(customRegistries, name) && (name in registries || customRegistries[name].registry === registry.registry)) {
-                    registry[FIELD_IS_CURRENT] = true;
-                    customRegistries[name] = registry;
-                }
+                registry[FIELD_IS_CURRENT] = true;
+                customRegistries[name] = registry;
                 setCustomRegistry(customRegistries);
                 printMsg(['', '   Registry has been set to: ' + newR, '']);
             }).catch(err => {
