@@ -8,7 +8,8 @@
     "url": "git://github.com/Pana/nrm.git"
   },
   "scripts": {
-    "star": "npm star nrm"
+    "star": "npm star nrm",
+    "test": "tap --reporter=specy --no-check-coverage"
   },
   "keywords": [
     "NPM",
@@ -30,5 +31,9 @@
     "only": "0.0.2",
     "open": ">=6.0.0",
     "request": "^2.72.0"
+  },
+  "devDependencies": {
+    "@types/tap": "^15.0.5",
+    "tap": "^15.0.10"
   }
 }
