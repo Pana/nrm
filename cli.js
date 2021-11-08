@@ -518,7 +518,7 @@ function getAllRegistry () {
 }
 
 function printErr (err) {
-    console.error('an error occured: ' + err);
+    console.error('an error occurred: ' + err);
 }
 
 function printMsg (infos) {
@@ -574,7 +574,25 @@ function hasOwnProperty (object, property) {
     return Object.prototype.hasOwnProperty.call(object, property);
 }
 
+// export command methods for test
 module.exports = {
     cleanRegistry,
-    errExit: exit
+    errExit: exit,
+    FIELD_REGISTRY,
+    FIELD_HOME,
+    FIELD_IS_CURRENT,
+    NRMRC,
+    NPMRC,
+    getCurrentRegistry,
+    getCustomRegistry,
+    getAllRegistry,
+    printErr,
+    printMsg,
+    getNPMInfo,
+    getINIInfo,
+    line,
+    equalsIgnoreCase,
+    hasOwnProperty,
+    config,
+    onUse,
 }
