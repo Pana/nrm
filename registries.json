@@ -16,7 +16,7 @@
         "registry": "https://r.cnpmjs.org/"
     },
     "taobao": {
-        "home": "https://npm.taobao.org",
+        "home": "https://npmmirror.com",
         "registry": "https://registry.npmmirror.com/"
     },
     "npmMirror": {
