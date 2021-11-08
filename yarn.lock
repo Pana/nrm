@@ -451,6 +451,13 @@
   resolved "https://registry.npmmirror.com/@types/node/download/@types/node-16.11.1.tgz#2e50a649a50fc403433a14f829eface1a3443e97"
   integrity sha1-LlCmSaUPxANDOhT4Ke+s4aNEPpc=
 
+"@types/npm@^7.19.0":
+  version "7.19.0"
+  resolved "https://registry.npmmirror.com/@types/npm/download/@types/npm-7.19.0.tgz#a62382cea8ca8ef8452553e3d5daa68a331cda70"
+  integrity sha1-piOCzqjKjvhFJVPj1dqmijMc2nA=
+  dependencies:
+    "@types/node" "*"
+
 "@types/prop-types@*":
   version "15.7.4"
   resolved "https://registry.npmmirror.com/@types/prop-types/download/@types/prop-types-15.7.4.tgz#fcf7205c25dff795ee79af1e30da2c9790808f11"
@@ -924,7 +931,7 @@ cli-cursor@^3.1.0:
 
 cli-table3@^0.6.0:
   version "0.6.0"
-  resolved "https://registry.npmmirror.com/cli-table3/download/cli-table3-0.6.0.tgz?cache=0&sync_timestamp=1632753995566&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2Fcli-table3%2Fdownload%2Fcli-table3-0.6.0.tgz#b7b1bc65ca8e7b5cef9124e13dc2b21e2ce4faee"
+  resolved "https://registry.npmmirror.com/cli-table3/download/cli-table3-0.6.0.tgz#b7b1bc65ca8e7b5cef9124e13dc2b21e2ce4faee"
   integrity sha1-t7G8ZcqOe1zvkSThPcKyHizk+u4=
   dependencies:
     object-assign "^4.1.0"
@@ -2379,7 +2386,7 @@ npm-user-validate@^1.0.1:
 
 npm@<8.0.0:
   version "7.24.2"
-  resolved "https://registry.npmmirror.com/npm/download/npm-7.24.2.tgz#861117af8241bea592289f22407230e5300e59ca"
+  resolved "https://registry.npmmirror.com/npm/download/npm-7.24.2.tgz?cache=0&sync_timestamp=1635473000940&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2Fnpm%2Fdownload%2Fnpm-7.24.2.tgz#861117af8241bea592289f22407230e5300e59ca"
   integrity sha1-hhEXr4JBvqWSKJ8iQHIw5TAOWco=
   dependencies:
     "@isaacs/string-locale-compare" "^1.1.0"
@@ -3312,6 +3319,11 @@ tcompare@^5.0.6:
   integrity sha1-uAkTXMo9Fl+xfV6rue0pJinjjjE=
   dependencies:
     diff "^4.0.2"
+
+test-console@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.npmmirror.com/test-console/download/test-console-2.0.0.tgz#a279f7e2e148815224d8446ffa5208f0077d68fb"
+  integrity sha1-onn34uFIgVIk2ERv+lII8Ad9aPs=
 
 test-exclude@^6.0.0:
   version "6.0.0"

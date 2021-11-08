@@ -33,7 +33,9 @@
     "request": "^2.72.0"
   },
   "devDependencies": {
+    "@types/npm": "^7.19.0",
     "@types/tap": "^15.0.5",
-    "tap": "^15.0.10"
+    "tap": "^15.0.10",
+    "test-console": "^2.0.0"
   }
 }
