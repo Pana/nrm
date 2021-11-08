@@ -174,6 +174,8 @@ test('config', t => {
     .then(() => {
       cli.getCurrentRegistry((cur) => {
         const npmrc = ini.parse(fs.readFileSync(NPMRC, 'utf-8'));
+        // `npm.config.get('registry')` will get a wrong registry, maybe cause below statement to fail
+        // just do not know why
         t.equal(cur, registry, 'can get registry rightly');
         t.equal(npmrc.registry, registry, 'can set registry rightly');
         t.equal(npmrc.home, home, 'can set home rightly');
