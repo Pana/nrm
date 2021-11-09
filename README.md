@@ -84,7 +84,7 @@ Usage: nrm [options] [command]
 * [yarn](https://yarnpkg.com)
 * [cnpm](http://cnpmjs.org)
 * [nodejitsu](https://www.nodejitsu.com)
-* [taobao](http://npm.taobao.org/)
+* [taobao](https://npmmirror.com)
 
 ## Related Projects
 
