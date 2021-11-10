@@ -8,7 +8,8 @@
     "url": "git://github.com/Pana/nrm.git"
   },
   "scripts": {
-    "star": "npm star nrm"
+    "star": "npm star nrm",
+    "test": "uvu tests"
   },
   "keywords": [
     "NPM",
