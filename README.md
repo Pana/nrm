@@ -29,6 +29,7 @@ $ nrm ls
   cnpm --------- https://r.cnpmjs.org/
   taobao ------- https://registry.npmmirror.com/
   npmMirror ---- https://skimdb.npmjs.com/registry/
+  huawei ------- https://repo.huaweicloud.com/repository/npm/
 
 ```
 
