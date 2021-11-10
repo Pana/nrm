@@ -30,5 +30,8 @@
     "only": "0.0.2",
     "open": ">=6.0.0",
     "request": "^2.72.0"
+  },
+  "devDependencies": {
+    "uvu": "^0.5.2"
   }
 }
