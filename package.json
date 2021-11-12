@@ -22,18 +22,13 @@
   },
   "homepage": "https://github.com/Pana/nrm",
   "dependencies": {
-    "async": "^1.5.2",
-    "commander": "^2.9.0",
-    "extend": "^3.0.0",
-    "humps": "^2.0.1",
-    "ini": "^1.1.0",
-    "npm": "<8.0.0",
-    "only": "0.0.2",
-    "open": ">=6.0.0",
-    "request": "^2.72.0"
+    "chalk": "^4.1.2",
+    "commander": "^8.3.0",
+    "ini": "^2.0.0",
+    "node-fetch": "2.6.6",
+    "open": "^8.4.0"
   },
   "devDependencies": {
-    "@types/npm": "^7.19.0",
     "@types/tap": "^15.0.5",
     "tap": "^15.0.10",
     "test-console": "^2.0.0"
