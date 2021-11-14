@@ -25,7 +25,7 @@ function padding(message = '', before = 1, after = 1) {
 }
 
 function printSuccess(message) {
-  console.error(chalk.bgGreenBright(padding('SUCCESS')) + ' ' + message);
+  console.log(chalk.bgGreenBright(padding('SUCCESS')) + ' ' + message);
 }
 
 function printError(error) {
@@ -58,7 +58,7 @@ async function getCurrentRegistry() {
       npmrc = readFile(NPMRC);
     } catch (error) {
       reject(error);
-      printError(error);
+      exit(error);
     }
     if (npmrc) {
       resolve(npmrc.registry);
@@ -89,6 +89,7 @@ function exit(error) {
 module.exports = {
   exit,
   geneDashLine,
+  printError,
   printSuccess,
   printMessages,
   isLowerCaseEqual,
