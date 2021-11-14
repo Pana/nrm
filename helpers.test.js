@@ -46,48 +46,39 @@ test('geneDashLine', t => {
   t.end();
 });
 
-test('getCurrentRegistry', t => {
+test('getCurrentRegistry', async t => {
   const registry = ' https://registry.npmjs.org/';
   writeFileSync(NPMRC, ini.stringify({ [REGISTRY]: registry }));
-  helpers
-    .getCurrentRegistry()
-    .then(currentRegistry => {
-      t.equal(currentRegistry, registry, 'can get the current registry in use');
-      t.end();
-    });
+  const currentRegistry = await helpers.getCurrentRegistry();
+  t.equal(currentRegistry, registry, 'can get the current registry in use');
+  t.end();
 });
 
-test('getRegistries', t => {
+test('getRegistries', async t => {
   const name = 'fake name';
   const registry = 'https://registry.example.com/';
   writeFileSync(NRMRC, ini.stringify({ [name]: { registry } }));
-  helpers
-    .getRegistries()
-    .then(registries => {
-      t.equal(Object.keys(registries).includes(name), true, 'can get all registries');
-      t.end();
-    });
+  const registries = await helpers.getRegistries();
+  t.equal(Object.keys(registries).includes(name), true, 'can get all registries');
+  t.end();
 });
 
 test('readFile', async t => {
   const content = 'hello nrm';
   writeFileSync(NRMRC, ini.stringify({ content: content }));
-  const result1 = helpers.readFile(NRMRC);
-  const result2 = helpers.readFile('file not exist');
+  const result1 = await helpers.readFile(NRMRC);
+  const result2 = await helpers.readFile('file not exist');
   t.equal(result1.content, content, 'can get the file content');
   t.same(result2, Object.create(null), 'can get an empty object when file is not exist');
   t.end();
 });
 
-test('writeFile', t => {
+test('writeFile', async t => {
   const content = { nrm: 'nrm is great' };
-  helpers
-    .writeFile(NRMRC, { content })
-    .then(() => {
-      const result = helpers.readFile(NRMRC);
-      t.same(result.content, content, 'can write content to the file');
-      t.end();
-    });
+  await helpers.writeFile(NRMRC, { content });
+  const result = await helpers.readFile(NRMRC);
+  t.same(result.content, content, 'can write content to the file');
+  t.end();
 });
 
 test('isLowerCaseEqual', t => {
