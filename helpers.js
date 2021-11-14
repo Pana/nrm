@@ -2,10 +2,21 @@ const fs = require('fs');
 const ini = require('ini');
 const chalk = require('chalk');
 
-const { NRMRC, NPMRC, REGISTRIES } = require('./constants');
+const { NRMRC, NPMRC, REGISTRY, REGISTRIES } = require('./constants');
 
-function readFile(file) {
-  return fs.existsSync(file) ? ini.parse(fs.readFileSync(file, 'utf-8')) : {};
+async function readFile(file) {
+  return new Promise(resolve => {
+    if (!fs.existsSync(file)) {
+      resolve({});
+    } else {
+      try {
+        const content = ini.parse(fs.readFileSync(file, 'utf-8'));
+        resolve(content);
+      } catch (error) {
+        exit(error);
+      }
+    }
+  });
 }
 
 async function writeFile(path, content) {
@@ -14,7 +25,6 @@ async function writeFile(path, content) {
       fs.writeFileSync(path, ini.stringify(content));
       resolve();
     } catch (error) {
-      reject(error);
       exit(error);
     }
   });
@@ -52,33 +62,13 @@ function isLowerCaseEqual(str1, str2) {
 }
 
 async function getCurrentRegistry() {
-  return new Promise((resolve, reject) => {
-    let npmrc;
-    try {
-      npmrc = readFile(NPMRC);
-    } catch (error) {
-      reject(error);
-      exit(error);
-    }
-    if (npmrc) {
-      resolve(npmrc.registry);
-    }
-  });
+  const npmrc = await readFile(NPMRC);
+  return npmrc[REGISTRY];
 }
 
 async function getRegistries() {
-  return new Promise((resolve, reject) => {
-    let customRegistries;
-    try {
-      customRegistries = readFile(NRMRC);
-    } catch (error) {
-      reject(error);
-      exit(error);
-    }
-    if (customRegistries) {
-      resolve(Object.assign({}, REGISTRIES, customRegistries));
-    }
-  });
+  const customRegistries = await readFile(NRMRC);
+  return Object.assign({}, REGISTRIES, customRegistries);
 }
 
 function exit(error) {
