@@ -1,6 +1,7 @@
 const fs = require('fs');
 const ini = require('ini');
 const chalk = require('chalk');
+const process = require('./process');
 
 const { NRMRC, NPMRC, REGISTRY, REGISTRIES } = require('./constants');
 
@@ -20,7 +21,7 @@ async function readFile(file) {
 }
 
 async function writeFile(path, content) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     try {
       fs.writeFileSync(path, ini.stringify(content));
       resolve();
@@ -71,6 +72,23 @@ async function getRegistries() {
   return Object.assign({}, REGISTRIES, customRegistries);
 }
 
+async function isRegistryNotFound(name) {
+  const registries = await getRegistries();
+  if (!Object.keys(registries).includes(name)) {
+    printError(`The registry '${name}' is not found.`);
+    return true;
+  }
+  return false;
+}
+
+async function isInternalRegistry(name, handle) {
+  if (Object.keys(REGISTRIES).includes(name)) {
+    printError(`You cannot ${handle} the nrm internal registry.`);
+    return true;
+  }
+  return false;
+}
+
 function exit(error) {
   printError(error);
   process.exit(1);
@@ -87,4 +105,6 @@ module.exports = {
   writeFile,
   getRegistries,
   getCurrentRegistry,
+  isRegistryNotFound,
+  isInternalRegistry,
 };
