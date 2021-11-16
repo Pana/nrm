@@ -4,7 +4,7 @@ const chalk = require('chalk');
 const { beforeEach, test, mock } = tap;
 const { stdout, stderr } = require('test-console');
 
-const { NPMRC, NRMRC, REGISTRY } = require('./constants');
+const { NPMRC, NRMRC, REGISTRY, REGISTRIES } = require('./constants');
 
 // ========== mock `fs` within helpers.js ==========
 
@@ -27,6 +27,9 @@ const helpers = mock('./helpers.js', {
     existsSync,
     readFileSync,
     writeFileSync,
+  },
+  './process': {
+    exit: () => console.error('process exit'),
   },
 });
 
@@ -110,6 +113,36 @@ test('printSuccess', t => {
 test('printMessages', t => {
   const output = stdout.inspectSync(() => helpers.printMessages(['hello', 'nrm']));
   t.same(output, printLineByLine('hello', 'nrm'), 'can print a group messages');
+  t.end();
+});
+
+test('isRegistryNotFound', async t => {
+  const unknown = 'unknown';
+  writeFileSync(NPMRC, ini.stringify(REGISTRIES));
+  const result1 = await helpers.isRegistryNotFound(unknown, false);
+  const result2 = await helpers.isRegistryNotFound('npm', false);
+  t.ok(result1, 'can return true when registry is not found');
+  t.notOk(result2, 'can return false when registry is exist');
+  t.end();
+});
+
+test('isInternalRegistry', async t => {
+  const name = 'custom name';
+  const registry = 'https://registry.example.com/';
+  writeFileSync(NPMRC, ini.stringify(REGISTRIES));
+  writeFileSync(NRMRC, ini.stringify({ [name]: registry }));
+  const result1 = await helpers.isInternalRegistry(name);
+  const result2 = await helpers.isInternalRegistry('npm');
+  t.notOk(result1, 'can return false when registry is customized');
+  t.ok(result2, 'can return true when registry is internal');
+  t.end();
+});
+
+test('exit', async t => {
+  const error = 'error message';
+  const [errorMessage, exitMessage] = await stderr.inspectSync(() => helpers.exit(error));
+  t.ok(errorMessage.includes(error), 'can print error message');
+  t.same([exitMessage], printLineByLine('process exit'), 'process will exit after print error message');
   t.end();
 });
 
