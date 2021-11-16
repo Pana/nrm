@@ -72,10 +72,10 @@ async function getRegistries() {
   return Object.assign({}, REGISTRIES, customRegistries);
 }
 
-async function isRegistryNotFound(name) {
+async function isRegistryNotFound(name, printErr = true) {
   const registries = await getRegistries();
   if (!Object.keys(registries).includes(name)) {
-    printError(`The registry '${name}' is not found.`);
+    printErr && printError(`The registry '${name}' is not found.`);
     return true;
   }
   return false;
@@ -83,7 +83,7 @@ async function isRegistryNotFound(name) {
 
 async function isInternalRegistry(name, handle) {
   if (Object.keys(REGISTRIES).includes(name)) {
-    printError(`You cannot ${handle} the nrm internal registry.`);
+    handle && printError(`You cannot ${handle} the nrm internal registry.`);
     return true;
   }
   return false;
