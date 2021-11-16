@@ -12,9 +12,11 @@ const {
   getCurrentRegistry,
   getRegistries,
   isLowerCaseEqual,
+  isRegistryNotFound,
+  isInternalRegistry,
 } = require('./helpers');
 
-const { NRMRC, NPMRC, AUTH, EMAIL, ALWAYS_AUTH, REGISTRIES, REPOSITORY, REGISTRY, HOME } = require('./constants');
+const { NRMRC, NPMRC, AUTH, EMAIL, ALWAYS_AUTH, REPOSITORY, REGISTRY, HOME } = require('./constants');
 
 async function onList() {
   const currentRegistry = await getCurrentRegistry();
@@ -51,11 +53,11 @@ async function onCurrent({ showUrl }) {
 }
 
 async function onUse(name) {
-  const registries = await getRegistries();
-  if (!Object.keys(registries).includes(name)) {
-    exit(`The registry '${name}' was not found.`);
+  if (await isRegistryNotFound(name)) {
+    return;
   }
 
+  const registries = await getRegistries();
   const registry = registries[name];
   const npmrc = await readFile(NPMRC);
   await writeFile(NPMRC, Object.assign(npmrc, registry));
@@ -64,12 +66,8 @@ async function onUse(name) {
 }
 
 async function onDelete(name) {
-  const registries = await getRegistries();
-  if (!Object.keys(registries).includes(name)) {
-    exit(`The registry '${name}' is not included in the nrm registries.`);
-  }
-  if (Object.keys(REGISTRIES).includes(name)) {
-    exit('You cannot delete the nrm internal registry.');
+  if (await isRegistryNotFound(name) || await isInternalRegistry(name, 'delete')) {
+    return;
   }
 
   const customRegistries = await readFile(NRMRC);
@@ -90,7 +88,7 @@ async function onAdd(name, url, home) {
   const registryNames = Object.keys(registries);
   const registryUrls = registryNames.map(name => registries[name][REGISTRY]);
   if (registryNames.includes(name) || registryUrls.some(eachUrl => isLowerCaseEqual(eachUrl, url))) {
-    exit('The registry name or url is already included in the nrm registries. Please make sure that the name and url are unique.');
+    return exit('The registry name or url is already included in the nrm registries. Please make sure that the name and url are unique.');
   }
 
   const newRegistry = {};
@@ -105,12 +103,8 @@ async function onAdd(name, url, home) {
 }
 
 async function onLogin(name, base64, { alwaysAuth, username, password, email }) {
-  const registries = await getRegistries();
-  if (!Object.keys(registries).includes(name)) {
-    exit(`The registry '${name}' is not included in the nrm registries.`);
-  }
-  if (Object.keys(REGISTRIES).includes(name)) {
-    exit('You cannot set authorization information of the nrm internal registry.');
+  if (await isRegistryNotFound(name) || await isInternalRegistry(name, 'set authorization information of')) {
+    return;
   }
 
   const customRegistries = await readFile(NRMRC);
@@ -120,7 +114,7 @@ async function onLogin(name, base64, { alwaysAuth, username, password, email }) 
   } else if (username && password) {
     registry[AUTH] = Buffer.from(`${username}:${password}`).toString('base64');
   } else {
-    exit('Authorization information in base64 format or username & password is required');
+    return exit('Authorization information in base64 format or username & password is required');
   }
 
   if (alwaysAuth) {
@@ -147,12 +141,8 @@ async function onLogin(name, base64, { alwaysAuth, username, password, email }) 
 }
 
 async function onSetRepository(name, repo) {
-  const registries = await getRegistries();
-  if (!Object.keys(registries).includes(name)) {
-    exit(`The registry '${name}' is not included in the nrm registries.`);
-  }
-  if (Object.keys(REGISTRIES).includes(name)) {
-    exit('You cannot set repository of the nrm internal registry.');
+  if (await isRegistryNotFound(name) || await isInternalRegistry(name, 'set repository of')) {
+    return;
   }
 
   const customRegistries = await readFile(NRMRC);
@@ -188,15 +178,12 @@ async function onDeleteScope(scopeName) {
 }
 
 async function onSetAttribute(name, { attr, value }) {
-  const registries = await getRegistries();
-  if (!Object.keys(registries).includes(name)) {
-    exit(`The registry '${name}' is not included in the nrm registries.`);
+  if (await isRegistryNotFound(name) || await isInternalRegistry(name, 'set attribute of')) {
+    return;
   }
-  if (Object.keys(REGISTRIES).includes(name)) {
-    exit('You cannot set attribute of the nrm internal registry.');
-  }
+
   if (REPOSITORY === attr) {
-    exit(`Use the ${chalk.green('nrm set-hosted-repo <name> <repo>')} command to set repository.`);
+    return exit(`Use the ${chalk.green('nrm set-hosted-repo <name> <repo>')} command to set repository.`);
   }
   const customRegistries = await readFile(NRMRC);
   const registry = customRegistries[name];
@@ -212,18 +199,15 @@ async function onSetAttribute(name, { attr, value }) {
 }
 
 async function onRename(name, newName) {
-  const registries = await getRegistries();
-  if (!Object.keys(registries).includes(name)) {
-    exit(`The registry '${name}' is not included in the nrm registries.`);
-  }
-  if (Object.keys(REGISTRIES).includes(name)) {
-    exit('You cannot rename the nrm internal registry.');
+  if (await isRegistryNotFound(name) || await isInternalRegistry(name, 'rename')) {
+    return;
   }
   if (name === newName) {
-    exit('The names cannot be the same.');
+    return exit('The names cannot be the same.');
   }
-  if (Object.keys(registries).includes(newName)) {
-    exit(`The new registry name '${newName}' is included in the nrm registries.`);
+
+  if (!await isRegistryNotFound(newName)) {
+    return exit(`The new registry name '${newName}' is included in the nrm registries.`);
   }
   const customRegistries = await readFile(NRMRC);
   customRegistries[newName] = JSON.parse(JSON.stringify(customRegistries[name]));
@@ -233,12 +217,13 @@ async function onRename(name, newName) {
 }
 
 async function onHome(name, browser) {
-  const registries = await getRegistries();
-  if (!Object.keys(registries).includes(name)) {
-    exit(`The registry '${name}' is not included in the nrm registries.`);
+  if (await isRegistryNotFound(name)) {
+    return;
   }
+
+  const registries = await getRegistries();
   if (!registries[name][HOME]) {
-    exit(`The homepage of registry '${name}' is not found.`);
+    return exit(`The homepage of registry '${name}' is not found.`);
   }
   open(registries[name][HOME], browser ? { app: { name: browser } } : undefined);
 }
@@ -246,14 +231,11 @@ async function onHome(name, browser) {
 async function onTest(target) {
   const registries = await getRegistries();
 
-  let sources = registries;
-
-  if (target) {
-    if (!Object.keys(registries).includes(target)) {
-      exit(`The registry '${target}' is not included in the nrm registries.`);
-    }
-    sources = { [target]: registries[target] };
+  if (target && await isRegistryNotFound(target)) {
+    return exit(`The registry '${target}' is not included in the nrm registries.`);
   }
+
+  const sources = target ? { [target]: registries[target] } : registries;
 
   const results = await Promise.all(Object.keys(sources).map(async name => {
     const { registry } = sources[name];
@@ -271,15 +253,15 @@ async function onTest(target) {
 
   const messages = [];
   const currentRegistry = await getCurrentRegistry();
+  const errorMsg = chalk.red(' (Fetch error, if this is your private registry, please ignore)');
   const length = Math.max(...Object.keys(sources).map(key => key.length)) + 3;
   results.forEach(({ registry, success, time, name }) => {
     const isFastest = time === fastest;
     const prefix = registry === currentRegistry ? chalk.green('* ') : '  ';
-    const suffix = success
-      ? isFastest
-        ? chalk.bgGreenBright(time + ' ms')
-        : time + ' ms'
-      : chalk.bgRed('Fetch Error');
+    let suffix = (isFastest && !target ? chalk.bgGreenBright(time + ' ms') : time + ' ms');
+    if (!success) {
+      suffix += errorMsg;
+    }
     messages.push(prefix + name + geneDashLine(name, length) + suffix);
   });
   printMessages(messages);
