@@ -4,7 +4,7 @@ const chalk = require('chalk');
 const { beforeEach, test, mock } = tap;
 const { stdout, stderr } = require('test-console');
 
-const { NPMRC, NRMRC, REGISTRY, REGISTRIES } = require('./constants');
+const { NPMRC, NRMRC, REGISTRY } = require('./constants');
 
 // ========== mock `fs` within helpers.js ==========
 
@@ -118,9 +118,11 @@ test('printMessages', t => {
 
 test('isRegistryNotFound', async t => {
   const unknown = 'unknown';
-  writeFileSync(NPMRC, ini.stringify(REGISTRIES));
+  const name = 'custom name';
+  const registry = 'https://registry.example.com/';
+  writeFileSync(NRMRC, ini.stringify({ [name]: registry }));
   const result1 = await helpers.isRegistryNotFound(unknown, false);
-  const result2 = await helpers.isRegistryNotFound('npm', false);
+  const result2 = await helpers.isRegistryNotFound(name, false);
   t.ok(result1, 'can return true when registry is not found');
   t.notOk(result2, 'can return false when registry is exist');
   t.end();
@@ -129,7 +131,6 @@ test('isRegistryNotFound', async t => {
 test('isInternalRegistry', async t => {
   const name = 'custom name';
   const registry = 'https://registry.example.com/';
-  writeFileSync(NPMRC, ini.stringify(REGISTRIES));
   writeFileSync(NRMRC, ini.stringify({ [name]: registry }));
   const result1 = await helpers.isInternalRegistry(name);
   const result2 = await helpers.isInternalRegistry('npm');
