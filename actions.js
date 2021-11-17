@@ -160,7 +160,7 @@ async function onSetRepository(name, repo) {
 
 async function onSetScope(scopeName, url) {
   const scopeRegistryKey = `${scopeName}:${REGISTRY}`;
-  const npmrc = await readFile(NRMRC);
+  const npmrc = await readFile(NPMRC);
   Object.assign(npmrc, { [scopeRegistryKey]: url });
   await writeFile(NPMRC, npmrc);
   printSuccess(`Set scope '${scopeRegistryKey}=${url}' success.`);
@@ -168,7 +168,7 @@ async function onSetScope(scopeName, url) {
 
 async function onDeleteScope(scopeName) {
   const scopeRegistryKey = `${scopeName}:${REGISTRY}`;
-  const npmrc = await readFile(NRMRC);
+  const npmrc = await readFile(NPMRC);
   if (npmrc[scopeRegistryKey]) {
     delete npmrc[scopeRegistryKey];
     await writeFile(NPMRC, npmrc);
@@ -193,7 +193,7 @@ async function onSetAttribute(name, { attr, value }) {
   const currentRegistry = await getCurrentRegistry();
   if (currentRegistry === registry[REGISTRY]) {
     const npmrc = await readFile(NPMRC);
-    await writeFile(Object.assign(npmrc, { [attr]: value }));
+    await writeFile(NPMRC, Object.assign(npmrc, { [attr]: value }));
   }
 }
 
@@ -205,8 +205,8 @@ async function onRename(name, newName) {
     return exit('The names cannot be the same.');
   }
 
-  if (!await isRegistryNotFound(newName)) {
-    return exit(`The new registry name '${newName}' is included in the nrm registries.`);
+  if (!await isRegistryNotFound(newName, false)) {
+    return exit(`The new registry name '${newName}' is already exist.`);
   }
   const customRegistries = await readFile(NRMRC);
   customRegistries[newName] = JSON.parse(JSON.stringify(customRegistries[name]));
@@ -231,7 +231,7 @@ async function onTest(target) {
   const registries = await getRegistries();
 
   if (target && await isRegistryNotFound(target)) {
-    return exit(`The registry '${target}' is not included in the nrm registries.`);
+    return exit();
   }
 
   const sources = target ? { [target]: registries[target] } : registries;
@@ -239,7 +239,7 @@ async function onTest(target) {
   const results = await Promise.all(Object.keys(sources).map(async name => {
     const { registry } = sources[name];
     const start = Date.now();
-    const response = await fetch(registry + 'nrm', { timeout: 10000 });
+    const response = await fetch(registry + 'nrm', { timeout: 5000 });
     return {
       name,
       registry,
