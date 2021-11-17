@@ -90,7 +90,7 @@ async function isInternalRegistry(name, handle) {
 }
 
 function exit(error) {
-  printError(error);
+  error && printError(error);
   process.exit(1);
 }
 
