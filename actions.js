@@ -79,7 +79,6 @@ async function onDelete(name) {
   const currentRegistry = await getCurrentRegistry();
   if (currentRegistry === registry[REGISTRY]) {
     await onUse('npm');
-    printSuccess(`And your current registry has been changed to 'npm'.`);
   }
 }
 
