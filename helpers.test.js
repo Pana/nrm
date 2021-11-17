@@ -142,7 +142,7 @@ test('exit', async t => {
   const error = 'error message';
   const [errorMessage, exitMessage] = await stderr.inspectSync(() => helpers.exit(error));
   t.ok(errorMessage.includes(error), 'can print error message');
-  t.same([exitMessage], printLineByLine('process exit'), 'process will exit after print error message');
+  t.ok(exitMessage.includes('process exit'), 'process will exit after print error message');
   t.end();
 });
 
