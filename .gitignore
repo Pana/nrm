@@ -10,8 +10,10 @@ lib-cov
 pids
 logs
 results
+.nyc_output
 
 .vscode
 npm-debug.log
 node_modules
 TODO.md
+package-lock.json
