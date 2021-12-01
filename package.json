@@ -29,10 +29,7 @@
     "open": "^8.4.0"
   },
   "devDependencies": {
-    "@types/tap": "^15.0.5",
     "coffee": "^5.4.0",
-    "jest": "^27.4.0",
-    "tap": "^15.0.10",
-    "test-console": "^2.0.0"
+    "jest": "^27.4.0"
   }
 }
