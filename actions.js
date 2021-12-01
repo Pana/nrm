@@ -155,6 +155,7 @@ async function onSetRepository(name, repo) {
     const npmrc = await readFile(NPMRC);
     Object.assign(npmrc, { [REPOSITORY]: repo });
     await writeFile(NPMRC, npmrc);
+    printSuccess(`Set repository attribute of npmrc successfully`);
   }
 }
 
@@ -264,6 +265,7 @@ async function onTest(target) {
     messages.push(prefix + name + geneDashLine(name, length) + suffix);
   });
   printMessages(messages);
+  return messages;
 }
 
 module.exports = {
