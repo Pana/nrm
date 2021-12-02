@@ -6,6 +6,7 @@ const { onHome, onTest } = require('.././actions.js');
 
 const isWin = process.platform === 'win32';
 
+jest.setTimeout(20000);
 jest.mock('open', () => {
   return jest.fn(() => {
     console.log('browser opened');
@@ -21,6 +22,19 @@ jest.mock('node-fetch', () => {
       );
     });
   });
+});
+
+beforeAll(async () => {
+  const { stdout } = await coffee.spawn('nrm', ['-V'], { shell: isWin }).end();
+  __NRM_VERSION__ = stdout ? stdout : null;
+  await coffee.spawn('npm', ['link'], { shell: isWin }).end();
+});
+
+afterAll(async () => {
+  await coffee.spawn('npm', ['unlink nrm -g'], { shell: isWin }).end();
+  if(__NRM_VERSION__ !== null) {
+    await coffee.spawn('npm', [`install -g nrm@${__NRM_VERSION__}`], { shell: isWin }).end();
+  }
 });
 
 it('nrm ls', async () => {
