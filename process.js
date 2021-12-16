@@ -1,2 +1,2 @@
-// export process for tap mock
+// export process for mock
 module.exports = global.process;
