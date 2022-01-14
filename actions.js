@@ -230,6 +230,7 @@ async function onHome(name, browser) {
 
 async function onTest(target) {
   const registries = await getRegistries();
+  const timeout = 5000;
 
   if (target && await isRegistryNotFound(target)) {
     return exit();
@@ -240,12 +241,21 @@ async function onTest(target) {
   const results = await Promise.all(Object.keys(sources).map(async name => {
     const { registry } = sources[name];
     const start = Date.now();
-    const response = await fetch(registry + 'nrm', { timeout: 5000 });
+    let status = '';
+    let isTimeout = false;
+    try {
+      const response = await fetch(registry + 'nrm', { timeout });
+      status = response.ok;
+    } catch (error) {
+      status = false;
+      isTimeout = error.type === 'request-timeout';
+    }
     return {
       name,
       registry,
-      success: response.ok,
+      success: status,
       time: Date.now() - start,
+      isTimeout
     };
   }));
 
@@ -254,13 +264,14 @@ async function onTest(target) {
   const messages = [];
   const currentRegistry = await getCurrentRegistry();
   const errorMsg = chalk.red(' (Fetch error, if this is your private registry, please ignore)');
+  const timeoutMsg = chalk.yellow(` (Fetch timeout over ${timeout} ms)`);
   const length = Math.max(...Object.keys(sources).map(key => key.length)) + 3;
-  results.forEach(({ registry, success, time, name }) => {
+  results.forEach(({ registry, success, time, name, isTimeout }) => {
     const isFastest = time === fastest;
     const prefix = registry === currentRegistry ? chalk.green('* ') : '  ';
-    let suffix = (isFastest && !target ? chalk.bgGreenBright(time + ' ms') : time + ' ms');
+    let suffix = (isFastest && !target) ? chalk.bgGreenBright(time + ' ms') : isTimeout ? 'timeout' : `${time} ms`;
     if (!success) {
-      suffix += errorMsg;
+      suffix += isTimeout ? timeoutMsg : errorMsg;
     }
     messages.push(prefix + name + geneDashLine(name, length) + suffix);
   });
