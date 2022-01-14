@@ -241,13 +241,12 @@ async function onTest(target) {
   const results = await Promise.all(Object.keys(sources).map(async name => {
     const { registry } = sources[name];
     const start = Date.now();
-    let status = '';
+    let status = false;
     let isTimeout = false;
     try {
       const response = await fetch(registry + 'nrm', { timeout });
       status = response.ok;
     } catch (error) {
-      status = false;
       isTimeout = error.type === 'request-timeout';
     }
     return {
