@@ -9,6 +9,7 @@ program
 
 program
   .command('ls')
+  .alias('list')
   .description('List all the registries')
   .action(actions.onList);
 
@@ -49,6 +50,7 @@ program
 
 program
   .command('del-scope <scopeName>')
+  .alias('delete-scope')
   .description('Remove a scope')
   .action(actions.onDeleteScope);
 
@@ -66,6 +68,7 @@ program
 
 program
   .command('del <name>')
+  .alias('delete')
   .description('Delete custom registry')
   .action(actions.onDelete);
 
