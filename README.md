@@ -21,7 +21,7 @@ $ npm install -g nrm
 
 ## Example
 ```
-$ nrm ls
+$ nrm ls  //or nrm list
 
 * npm ---------- https://registry.npmjs.org/
   yarn --------- https://registry.yarnpkg.com/
@@ -46,7 +46,7 @@ Usage: nrm [options] [command]
 
   Commands:
 
-    ls                                    List all the registries
+    ls|list                               List all the registries. 
     current                               Show current registry name
     use <registry>                        Change registry to registry
     add <registry> <url> [home]           Add one custom registry
@@ -57,11 +57,11 @@ Usage: nrm [options] [command]
       -e  --email <email>                   Your email for this registry
     set-hosted-repo <registry> <value>    Set hosted npm repository for a custom registry to publish packages
     set-scope <scopeName> <value>         Associating a scope with a registry
-    del-scope <scopeName>                 Remove a scope
+    del-scope|delete-scope <scopeName>    Remove a scope
     set <registryName>                    Set custom registry attribute
       -a  --attr <attr>                    Set custorm registry attribute
       -v  --value <value>                  Set custorm registry value
-    del <registry>                        Delete one custom registry
+    del|delete <registry>                 Delete one custom registry
     rename <registryName> <newName>       Set custom registry name
     home <registry> [browser]             Open the homepage of registry with optional browser
     publish [<tarball>|<folder>]          Publish package to current registry if current registry is a custom registry. The field 'repository' of current custom registry is required running this command. If you're not using custom registry, this command will run npm publish directly
