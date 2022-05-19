@@ -1,3 +1,7 @@
+// fix warnings
+// MaxListenersExceededWarning: Possible EventEmitter memory leak detected
+require('events').EventEmitter.defaultMaxListeners = 0;
+
 const coffee = require('coffee');
 const open = require('open');
 const chalk = require('chalk');
