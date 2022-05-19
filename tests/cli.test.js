@@ -115,7 +115,7 @@ describe('nrm command which needs to add a custom registry', () => {
   });
 
   it('nrm test [registry]', async () => {
-    const results = await onTest();
+    const results = await onTest(null, {testSkipMsg: true});
     expect(results.every(ele => /\d+\sms/.test(ele))).toBe(true);
     expect(results.some(ele => ele.includes('*'))).toBe(true);
     expect(results.some(ele => ele.includes('please ignore'))).toBe(true);
