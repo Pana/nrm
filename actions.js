@@ -228,7 +228,7 @@ async function onHome(name, browser) {
   open(registries[name][HOME], browser ? { app: { name: browser } } : undefined);
 }
 
-async function onTest(target) {
+async function onTest(target, skipMsg=true) {
   const registries = await getRegistries();
   const timeout = 5000;
 
@@ -274,7 +274,9 @@ async function onTest(target) {
     }
     messages.push(prefix + name + geneDashLine(name, length) + suffix);
   });
-  printMessages(messages);
+  if(!skipMsg) {
+    printMessages(messages);
+  }
   return messages;
 }
 
