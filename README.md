@@ -23,7 +23,7 @@ $ npm install -g nrm
 ```
 $ nrm ls
 
-* npm ---------- https://registry.npmjs.org/
+* npm ---------- https://registry.npmjs.com/
   yarn --------- https://registry.yarnpkg.com/
   tencent ------ https://mirrors.cloud.tencent.com/npm/
   cnpm --------- https://r.cnpmjs.org/
