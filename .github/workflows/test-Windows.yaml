@@ -1,0 +1,32 @@
+name: Unit Test(Windows)
+on: 
+  pull_request:
+    branches: [master]
+jobs:
+  ut-windows:
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [16.x]
+        os: [windows-latest] # windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 25
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Yarn
+        run: npm install yarn -g
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Test
+        run: yarn run test
