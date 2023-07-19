@@ -1,4 +1,4 @@
-const open = require('open');
+const open = import('open');
 const chalk = require('chalk');
 const fetch = require('node-fetch');
 
