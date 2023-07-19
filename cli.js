@@ -34,7 +34,8 @@ program
   .option('-u, --username <username>', 'Your user name for this registry')
   .option('-p, --password <password>', 'Your password for this registry')
   .option('-e, --email <email>', 'Your email for this registry')
-  .description('Set authorize information for a custom registry with a base64 encoded string or username and password')
+  .option('-t, --access-token <token>', 'Your access token for this registry')
+  .description('Set authorize information for a custom registry with a base64 encoded string or username and password or access token')
   .action(actions.onLogin);
 
 program

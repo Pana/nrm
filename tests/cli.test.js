@@ -146,14 +146,20 @@ describe('nrm command which needs to add a custom registry', () => {
   it('login <name> [base64]', async () => {
     const username = 'username';
     const password = 'password';
+    const token = 'npmTkUsr01PkgABCdefG';
 
     await coffee.spawn('nrm', ['login',`${__REGISTRY__}`,'-u', `${username}`, '-p', `${password}`], { shell: isWin })
       .expect('stdout', /success/g)
       .expect('code', 0)
       .end();
 
+    await coffee.spawn('nrm', ['login',`${__REGISTRY__}`,'-t', `${token}`], { shell: isWin })
+      .expect('stdout', /success/g)
+      .expect('code', 0)
+      .end();
+
     await coffee.spawn('nrm', ['login',`${__REGISTRY__}`], { shell: isWin })
-      .expect('stderr', /Authorization information in base64 format or username & password is required/g)
+      .expect('stderr', /Authorization information in base64 format or username & password or accessToken is required/g)
       .end();
   });
 });
