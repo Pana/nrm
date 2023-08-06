@@ -113,7 +113,7 @@ async function onLogin(name, base64, { alwaysAuth, username, password, email }) 
   } else if (username && password) {
     registry[AUTH] = Buffer.from(`${username}:${password}`).toString('base64');
   } else {
-    return exit('Authorization information in base64 format or username & password is required');
+    return exit('Authorization information in base64 format or username & password is required.');
   }
 
   if (alwaysAuth) {
@@ -155,7 +155,7 @@ async function onSetRepository(name, repo) {
     const npmrc = await readFile(NPMRC);
     Object.assign(npmrc, { [REPOSITORY]: repo });
     await writeFile(NPMRC, npmrc);
-    printSuccess(`Set repository attribute of npmrc successfully`);
+    printSuccess(`Set repository attribute of npmrc successfully.`);
   }
 }
 
