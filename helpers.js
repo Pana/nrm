@@ -82,13 +82,12 @@ async function isRegistryNotFound(name, printErr = true) {
 }
 
 async function isInternalRegistry(name, handle) {
-  if (Object.keys(REGISTRIES).includes(name)) {
+  if (!Object.keys(REGISTRIES).includes(name)) {
     handle && printError(`You cannot ${handle} the nrm internal registry.`);
     return true;
   }
   return false;
 }
-
 function exit(error) {
   error && printError(error);
   process.exit(1);
