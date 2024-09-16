@@ -9,7 +9,9 @@
   },
   "scripts": {
     "star": "npm star nrm",
-    "test": "jest"
+    "test": "jest",
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish"
   },
   "keywords": [
     "NPM",
@@ -29,6 +31,7 @@
     "open": "^8.4.2"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.8",
     "coffee": "^5.4.0",
     "jest": "^27.4.0"
   }
