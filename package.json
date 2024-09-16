@@ -28,7 +28,7 @@
     "commander": "^8.3.0",
     "ini": "^2.0.0",
     "open": "^8.4.2",
-    "undici": "^6.19.8"
+    "undici": "5.28.2"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.8",
