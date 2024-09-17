@@ -80,6 +80,11 @@ program
   .action(actions.onTest);
 
 program
+  .command('publish [registry]')
+  .description('Publish package to current registry if current registry is a custom registry. The field "repository" of current custom registry is required running this command. If you\'re not using custom registry, this command will run npm publish directly. If you want to publish to a specific registry, you can use the registry name to specify the registry.')
+  .action(actions.onPublish);
+
+program
   .parse(process.argv);
 
 if (process.argv.length === 2) {

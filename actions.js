@@ -1,6 +1,7 @@
 const open = require('open');
 const chalk = require('chalk');
 const fetch = require('node-fetch');
+const { execSync } = require('child_process');
 
 const {
   exit,
@@ -14,6 +15,7 @@ const {
   isLowerCaseEqual,
   isRegistryNotFound,
   isInternalRegistry,
+  printError,
 } = require('./helpers');
 
 const { NRMRC, NPMRC, AUTH, EMAIL, ALWAYS_AUTH, REPOSITORY, REGISTRY, HOME } = require('./constants');
@@ -278,6 +280,34 @@ async function onTest(target) {
   return messages;
 }
 
+async function onPublish(registry) {
+  const npmrc = await readFile(NPMRC);
+  const currentRegistry = npmrc[REGISTRY];
+  const currentRepositry = npmrc[REPOSITORY];
+  let publishRepositry = currentRepositry;
+
+  if(!(await isRegistryNotFound(registry))) {
+    const registries = await getRegistries();;
+    const customRegistry = registries?.[registry];
+    const customRepositry = customRegistry?.[REPOSITORY] ?? customRegistry?.[REGISTRY];
+    if(customRepositry) {
+      publishRepositry = customRepositry;
+    }
+  }
+  
+  try {
+    execSync(`npm config set registry ${publishRepositry}`);
+    printSuccess(`Publishing to ${publishRepositry}...`);
+    execSync(`npm publish`, { stdio: 'inherit' });
+    printSuccess('Package published successfully.');
+  } catch (error) {
+    printError(`Failed to publish package: ${error.message}`);
+  } finally {
+    execSync(`npm config set registry ${currentRegistry}`);
+  }
+}
+
+
 module.exports = {
   onList,
   onCurrent,
@@ -292,4 +322,5 @@ module.exports = {
   onSetAttribute,
   onTest,
   onLogin,
+  onPublish,
 };
