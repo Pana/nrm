@@ -22,5 +22,9 @@
   "npmMirror": {
     "home": "https://skimdb.npmjs.com/",
     "registry": "https://skimdb.npmjs.com/registry/"
+  },
+  "huawei": {
+    "home": "https://www.huaweicloud.com/special/npm-jingxiang.html",
+    "registry": "https://repo.huaweicloud.com/repository/npm/"
   }
 }
