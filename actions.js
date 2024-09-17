@@ -286,7 +286,7 @@ async function onPublish(registry) {
   const currentRepositry = npmrc[REPOSITORY];
   let publishRepositry = currentRepositry;
 
-  if(!(await isRegistryNotFound(registry))) {
+  if(registry && !(await isRegistryNotFound(registry))) {
     const registries = await getRegistries();;
     const customRegistry = registries?.[registry];
     const customRepositry = customRegistry?.[REPOSITORY] ?? customRegistry?.[REGISTRY];
