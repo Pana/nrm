@@ -13,15 +13,17 @@ jest.mock('open', () => {
   });
 });
 
-jest.mock('node-fetch', () => {
-  return jest.fn(url => {
-    return new Promise(resolve => {
-      setTimeout(
-        () => resolve({ ok: !url.includes('error.com') }),
-        (Math.random() + 1)*1000,
-      );
-    });
-  });
+jest.mock('undici', () => {
+  return {
+    fetch: jest.fn(url => {
+      return new Promise(resolve => {
+        setTimeout(
+          () => resolve({ ok: !url.includes('error.com') }),
+          (Math.random() + 1)*1000,
+        );
+      });
+    })
+  }
 });
 
 beforeAll(async () => {

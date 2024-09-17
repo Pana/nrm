@@ -1,6 +1,6 @@
 const open = require('open');
 const chalk = require('chalk');
-const fetch = require('node-fetch');
+const { fetch } = require('undici');
 const { execSync } = require('child_process');
 
 const {
@@ -246,10 +246,10 @@ async function onTest(target) {
     let status = false;
     let isTimeout = false;
     try {
-      const response = await fetch(registry + 'nrm', { timeout });
+      const response = await fetch(registry + 'nrm', { signal: AbortSignal.timeout(timeout) });
       status = response.ok;
     } catch (error) {
-      isTimeout = error.type === 'request-timeout';
+      isTimeout = error.name === 'TimeoutError';
     }
     return {
       name,
