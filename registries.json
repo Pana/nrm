@@ -1,7 +1,7 @@
 {
   "npm": {
-    "home": "https://www.npmjs.org",
-    "registry": "https://registry.npmjs.org/"
+    "home": "https://www.npmjs.com/",
+    "registry": "https://registry.npmjs.com/"
   },
   "yarn": {
     "home": "https://yarnpkg.com",
