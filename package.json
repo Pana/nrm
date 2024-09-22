@@ -2,7 +2,9 @@
   "name": "nrm",
   "version": "1.3.0",
   "description": "npm registry manager can help you easy and fast switch between different npm registries, now include: cnpm, taobao, nj(nodejitsu), edunpm",
-  "bin": "./cli.js",
+  "bin": {
+    "nrm": "cli.js"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/Pana/nrm.git"
