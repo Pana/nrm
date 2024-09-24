@@ -280,15 +280,15 @@ async function onTest(target) {
   return messages;
 }
 
-async function onPublish(registry) {
+async function onPublish(name) {
   const npmrc = await readFile(NPMRC);
   const currentRegistry = npmrc[REGISTRY];
   const currentRepositry = npmrc[REPOSITORY];
   let publishRepositry = currentRepositry;
 
-  if(registry && !(await isRegistryNotFound(registry))) {
+  if(name && !(await isRegistryNotFound(name))) {
     const registries = await getRegistries();;
-    const customRegistry = registries?.[registry];
+    const customRegistry = registries?.[name];
     const customRepositry = customRegistry?.[REPOSITORY] ?? customRegistry?.[REGISTRY];
     if(customRepositry) {
       publishRepositry = customRepositry;
@@ -297,7 +297,7 @@ async function onPublish(registry) {
   
   try {
     execSync(`npm config set registry ${publishRepositry}`);
-    printSuccess(`Publishing to ${publishRepositry}...`);
+    printMessages([`Publishing to ${publishRepositry}...`]);
     execSync(`npm publish`, { stdio: 'inherit' });
     printSuccess('Package published successfully.');
   } catch (error) {
