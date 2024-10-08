@@ -1,8 +1,8 @@
 const coffee = require('coffee');
 const open = require('open');
 const chalk = require('chalk');
-
-const { onHome, onTest } = require('.././actions.js');
+const { getRegistries, printSuccess, printMessages } = require('../helpers.js');
+const { onHome, onTest, onPublish } = require('../actions.js');
 
 const isWin = process.platform === 'win32';
 
@@ -19,10 +19,41 @@ jest.mock('undici', () => {
       return new Promise(resolve => {
         setTimeout(
           () => resolve({ ok: !url.includes('error.com') }),
-          (Math.random() + 1)*1000,
+          (Math.random() + 1) * 1000,
         );
       });
     })
+  }
+});
+jest.mock('child_process', () => {
+  const originalModule = jest.requireActual('child_process')
+
+  return {
+    ...originalModule,
+    execSync: jest.fn((command, options) => {
+      if (command.includes('npm publish')) {
+        return jest.fn();
+      }
+
+      return originalModule.execSync(command, options);
+    })
+  };
+});
+
+jest.mock('../helpers', () => {
+  const originalModule = jest.requireActual('../helpers');
+  return {
+    ...originalModule,
+    printMessages: jest.fn(
+      (message) => {
+        originalModule.printMessages(message);
+      }
+    ),
+    printSuccess: jest.fn(
+      (message) => {
+        originalModule.printSuccess(message);
+      }
+    ),
   }
 });
 
@@ -34,7 +65,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await coffee.spawn('npm', ['unlink', 'nrm', '-g'], { shell: isWin }).end();
-  if(__NRM_VERSION__ !== null) {
+  if (__NRM_VERSION__ !== null) {
     await coffee.spawn('npm', [`install -g nrm@${__NRM_VERSION__}`], { shell: isWin }).end();
   }
 });
@@ -86,7 +117,7 @@ describe('nrm command which needs to add a custom registry', () => {
   });
 
   afterEach(async () => {
-    await coffee.spawn('nrm', ['del',`${__REGISTRY__}`], { shell: isWin })
+    await coffee.spawn('nrm', ['del', `${__REGISTRY__}`], { shell: isWin })
       .expect('stdout', /has been deleted successfully/g)
       .expect('code', 0)
       .end();
@@ -97,7 +128,7 @@ describe('nrm command which needs to add a custom registry', () => {
     __REGISTRY__ = newName;
     const match = new RegExp(`The registry '${customName}' has been renamed to '${newName}'`, 'g');
 
-    await coffee.spawn('nrm', ['rename',`${customName}`, `${newName}`], { shell: isWin })
+    await coffee.spawn('nrm', ['rename', `${customName}`, `${newName}`], { shell: isWin })
       .expect('stdout', match)
       .expect('code', 0)
       .end();
@@ -124,12 +155,12 @@ describe('nrm command which needs to add a custom registry', () => {
     const scopeName = 'nrm';
     const url = 'https://scope.example.org';
 
-    await coffee.spawn('nrm', ['set-scope',`${scopeName}`, `${url}`], { shell: isWin })
+    await coffee.spawn('nrm', ['set-scope', `${scopeName}`, `${url}`], { shell: isWin })
       .expect('stdout', /success/g)
       .expect('code', 0)
       .end();
 
-    await coffee.spawn('nrm', ['del-scope',`${scopeName}`], { shell: isWin })
+    await coffee.spawn('nrm', ['del-scope', `${scopeName}`], { shell: isWin })
       .expect('stdout', /success/g)
       .expect('code', 0)
       .end();
@@ -139,7 +170,7 @@ describe('nrm command which needs to add a custom registry', () => {
     const repo = 'repo';
     const match = new RegExp(`Set the repository of registry '${__REGISTRY__}' successfully`, 'g');
 
-    await coffee.spawn('nrm', ['set-hosted-repo',`${__REGISTRY__}`, `${repo}`], { shell: isWin })
+    await coffee.spawn('nrm', ['set-hosted-repo', `${__REGISTRY__}`, `${repo}`], { shell: isWin })
       .expect('stdout', match)
       .expect('code', 0)
       .end();
@@ -149,15 +180,61 @@ describe('nrm command which needs to add a custom registry', () => {
     const username = 'username';
     const password = 'password';
 
-    await coffee.spawn('nrm', ['login',`${__REGISTRY__}`,'-u', `${username}`, '-p', `${password}`], { shell: isWin })
+    await coffee.spawn('nrm', ['login', `${__REGISTRY__}`, '-u', `${username}`, '-p', `${password}`], { shell: isWin })
       .expect('stdout', /success/g)
       .expect('code', 0)
       .end();
 
-    await coffee.spawn('nrm', ['login',`${__REGISTRY__}`], { shell: isWin })
+    await coffee.spawn('nrm', ['login', `${__REGISTRY__}`], { shell: isWin })
       .expect('stderr', /Authorization information in base64 format or username & password is required/g)
       .end();
   });
+
+
+  describe('nrm publish [name]', () => {
+    const matchSuccess = 'Package published successfully.';
+
+    beforeEach(async () => {
+      jest.clearAllMocks();
+    });
+
+    it('publish to registry if there is not repository', async () => {
+      const matchMessage = [`Publishing to ${url}...`];
+
+      await onPublish(__REGISTRY__);
+      expect(printMessages).toHaveBeenCalledWith(matchMessage);
+      expect(printSuccess).toHaveBeenCalledWith(matchSuccess);
+    });
+
+    describe('publish to repository if there is repository', () => {
+      const repo = 'repo';
+      const matchMessage = [`Publishing to ${repo}...`];
+
+      beforeEach(async () => {
+        const match = new RegExp(`Set the repository of registry '${__REGISTRY__}' successfully`, 'g');
+        await coffee.spawn('nrm', ['set-hosted-repo', `${__REGISTRY__}`, `${repo}`], { shell: isWin })
+          .expect('stdout', match)
+          .expect('code', 0)
+          .end();
+      })
+
+      it('publish without name', async () => {
+        await coffee.spawn('nrm', ['use', __REGISTRY__], { shell: isWin }).end();
+
+        await onPublish();
+        expect(printMessages).toHaveBeenCalledWith(matchMessage);
+        expect(printSuccess).toHaveBeenCalledWith(matchSuccess);
+      })
+
+      it('publish with name', async () => {
+        await coffee.spawn('nrm', ['use', 'cnpm'], { shell: isWin }).end();
+
+        await onPublish(__REGISTRY__);
+        expect(printMessages).toHaveBeenCalledWith(matchMessage);
+        expect(printSuccess).toHaveBeenCalledWith(matchSuccess);
+      })
+    });
+  })
 });
 
 it('nrm home <registry> [browser]', async () => {
