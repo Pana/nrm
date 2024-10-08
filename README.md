@@ -92,8 +92,7 @@ Usage: nrm [options] [command]
 
 ## TODO 
 
-1. Add more registry: github, [sonatype](https://help.sonatype.com/repomanager3/formats/npm-registry), [sap](https://help.sap.com/viewer/4505d0bdaf4948449b7f7379d24d0f0d/2.0.03/en-US/726e5d41462c4eb29eaa6cc83ff41e84.html)
-
+1. Add more registries: github, [sonatype](https://help.sonatype.com/repomanager3/formats/npm-registry)
 
 ## Notice
 
