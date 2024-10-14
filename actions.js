@@ -17,7 +17,7 @@ const {
 
 const { NRMRC, NPMRC, AUTH, EMAIL, ALWAYS_AUTH, REPOSITORY, REGISTRY, HOME } = require('./constants');
 
-async function onList() {
+async function onList({keyboard}) {
   const currentRegistry = await getCurrentRegistry();
   const registries = await getRegistries();
   const keys = Object.keys(registries);
@@ -29,7 +29,22 @@ async function onList() {
     return prefix + key + geneDashLine(key, length) + registry[REGISTRY];
   });
 
-  printMessages(messages);
+  if (keyboard) {
+    const prompt = inquirer.createPromptModule()
+    prompt([
+      {
+        type: 'list',
+        name: 'name',
+        message: 'Select the registry you want to switch:',
+        choices: keys,
+      },
+    ])
+      .then((answers) => {
+        onUse(answers.name);
+      })
+  } else {
+    printMessages(messages);
+  }
 }
 
 async function onCurrent({ showUrl }) {
