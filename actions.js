@@ -1,6 +1,7 @@
 const open = require('open');
 const chalk = require('chalk');
 const { fetch } = require('undici');
+const inquirer = require('inquirer');
 const {
   exit,
   readFile,
