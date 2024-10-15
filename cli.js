@@ -20,6 +20,7 @@ program
 
 program
   .command('use <name>')
+  .option('-k, --keyboard', 'Use keyboard to select registry')
   .description('Change current registry')
   .action(actions.onUse);
 

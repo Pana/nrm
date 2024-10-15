@@ -1,6 +1,7 @@
 const open = require('open');
 const chalk = require('chalk');
 const { fetch } = require('undici');
+const { select } = require('@inquirer/prompts');
 const {
   exit,
   readFile,
@@ -51,17 +52,28 @@ async function onCurrent({ showUrl }) {
   }
 }
 
-async function onUse(name) {
+async function onUse(name, { keyboard }) {
   if (await isRegistryNotFound(name)) {
     return;
   }
 
   const registries = await getRegistries();
-  const registry = registries[name];
   const npmrc = await readFile(NPMRC);
-  await writeFile(NPMRC, Object.assign(npmrc, registry));
+  let registryName = name;
 
-  printSuccess(`The registry has been changed to '${name}'.`);
+  if (keyboard) {
+    const keys = Object.keys(registries);
+    const answer = await select({
+      message: 'Select the registry you want to switch:',
+      choices: keys,
+    });
+    registryName = answer;
+  }
+
+  const registry = registries[registryName];
+
+  await writeFile(NPMRC, Object.assign(npmrc, registry));
+  printSuccess(`The registry has been changed to '${registryName}'.`);
 }
 
 async function onDelete(name) {
