@@ -8,8 +8,8 @@
     "registry": "https://registry.yarnpkg.com/"
   },
   "tencent": {
-    "home": "https://mirrors.cloud.tencent.com/npm/",
-    "registry": "https://mirrors.cloud.tencent.com/npm/"
+    "home": "https://mirrors.tencent.com/npm/",
+    "registry": "https://mirrors.tencent.com/npm/"
   },
   "cnpm": {
     "home": "https://cnpmjs.org",
