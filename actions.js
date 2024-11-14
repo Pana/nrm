@@ -15,7 +15,7 @@ const {
   isInternalRegistry,
 } = require('./helpers');
 
-const { NRMRC, NPMRC, AUTH, EMAIL, ALWAYS_AUTH, REPOSITORY, REGISTRY, HOME } = require('./constants');
+const { NRMRC, NPMRC, AUTH, AUTH_TOKEN, EMAIL, ALWAYS_AUTH, REPOSITORY, REGISTRY, HOME } = require('./constants');
 
 async function onList() {
   const currentRegistry = await getCurrentRegistry();
@@ -100,7 +100,7 @@ async function onAdd(name, url, home) {
   printSuccess(`Add registry ${name} success, run ${chalk.green('nrm use ' + name)} command to use ${name} registry.`);
 }
 
-async function onLogin(name, base64, { alwaysAuth, username, password, email }) {
+async function onLogin(name, base64, { alwaysAuth, username, password, email, accessToken }) {
   if (await isRegistryNotFound(name) || await isInternalRegistry(name, 'set authorization information of')) {
     return;
   }
@@ -111,8 +111,10 @@ async function onLogin(name, base64, { alwaysAuth, username, password, email }) 
     registry[AUTH] = base64;
   } else if (username && password) {
     registry[AUTH] = Buffer.from(`${username}:${password}`).toString('base64');
+  } else if (accessToken) {
+    registry[AUTH_TOKEN] = accessToken;
   } else {
-    return exit('Authorization information in base64 format or username & password is required');
+    return exit('Authorization information in base64 format or username & password or accessToken is required');
   }
 
   if (alwaysAuth) {
@@ -132,6 +134,7 @@ async function onLogin(name, base64, { alwaysAuth, username, password, email }) 
     const npmrc = await readFile(NPMRC);
     await writeFile(NPMRC, Object.assign(npmrc, {
       [AUTH]: registry[AUTH],
+      [AUTH_TOKEN]: registry[AUTH_TOKEN],
       [ALWAYS_AUTH]: registry[ALWAYS_AUTH],
       [EMAIL]: registry[EMAIL],
     }));
