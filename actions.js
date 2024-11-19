@@ -1,5 +1,6 @@
 const open = require('open');
 const chalk = require('chalk');
+const { select } = require('@inquirer/prompts');
 const { fetch } = require('undici');
 const {
   exit,
@@ -52,11 +53,20 @@ async function onCurrent({ showUrl }) {
 }
 
 async function onUse(name) {
+  const registries = await getRegistries();
+
+  // if name is undefined, select the registry alias from list
+  if (name === undefined) {
+    name = await select({
+      message: 'Please select the registry you want to use',
+      choices: Object.keys(registries),
+    });
+  }
+
   if (await isRegistryNotFound(name)) {
     return;
   }
 
-  const registries = await getRegistries();
   const registry = registries[name];
   const npmrc = await readFile(NPMRC);
   await writeFile(NPMRC, Object.assign(npmrc, registry));
