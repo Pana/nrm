@@ -4,13 +4,9 @@ const actions = require('./actions');
 const PKG = require('./package.json');
 const { program } = require('commander');
 
-program
-  .version(PKG.version);
+program.version(PKG.version);
 
-program
-  .command('ls')
-  .description('List all the registries')
-  .action(actions.onList);
+program.command('ls').description('List all the registries').action(actions.onList);
 
 program
   .command('current')
@@ -18,15 +14,9 @@ program
   .description('Show current registry name or URL')
   .action(actions.onCurrent);
 
-program
-  .command('use <name>')
-  .description('Change current registry')
-  .action(actions.onUse);
+program.command('use <name>').description('Change current registry').action(actions.onUse);
 
-program
-  .command('add <name> <url> [home]')
-  .description('Add custom registry')
-  .action(actions.onAdd);
+program.command('add <name> <url> [home]').description('Add custom registry').action(actions.onAdd);
 
 program
   .command('login <name> [base64]')
@@ -47,10 +37,7 @@ program
   .description('Associating a scope with a registry')
   .action(actions.onSetScope);
 
-program
-  .command('del-scope <scopeName>')
-  .description('Remove a scope')
-  .action(actions.onDeleteScope);
+program.command('del-scope <scopeName>').description('Remove a scope').action(actions.onDeleteScope);
 
 program
   .command('set <name>')
@@ -59,15 +46,9 @@ program
   .description('Set a custom registry attribute')
   .action(actions.onSetAttribute);
 
-program
-  .command('rename <name> <newName>')
-  .description('Change custom registry name')
-  .action(actions.onRename);
+program.command('rename <name> <newName>').description('Change custom registry name').action(actions.onRename);
 
-program
-  .command('del <name>')
-  .description('Delete custom registry')
-  .action(actions.onDelete);
+program.command('del <name>').description('Delete custom registry').action(actions.onDelete);
 
 program
   .command('home <name> [browser]')
@@ -79,8 +60,7 @@ program
   .description('Show response time for specific or all registries')
   .action(actions.onTest);
 
-program
-  .parse(process.argv);
+program.parse(process.argv);
 
 if (process.argv.length === 2) {
   program.outputHelp();

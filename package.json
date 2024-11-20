@@ -13,7 +13,8 @@
     "star": "npm star nrm",
     "test": "jest",
     "changeset:version": "changeset version",
-    "changeset:publish": "changeset publish"
+    "changeset:publish": "changeset publish",
+    "format": "prettier . --write"
   },
   "keywords": [
     "npm",
@@ -35,6 +36,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.27.8",
     "coffee": "^5.4.0",
-    "jest": "^27.4.0"
+    "jest": "^27.4.0",
+    "prettier": "^3.3.3"
   }
 }

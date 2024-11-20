@@ -6,7 +6,7 @@ const process = require('./process');
 const { NRMRC, NPMRC, REGISTRY, REGISTRIES } = require('./constants');
 
 async function readFile(file) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     if (!fs.existsSync(file)) {
       resolve({});
     } else {
@@ -21,7 +21,7 @@ async function readFile(file) {
 }
 
 async function writeFile(path, content) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     try {
       fs.writeFileSync(path, ini.stringify(content));
       resolve();

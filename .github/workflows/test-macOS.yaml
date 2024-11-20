@@ -1,5 +1,5 @@
 name: Unit Test(macOS)
-on: 
+on:
   pull_request:
     branches: [master]
 jobs:

@@ -8,8 +8,8 @@ const REGISTRY = 'registry';
 const REPOSITORY = 'repository';
 const ALWAYS_AUTH = 'always-auth';
 const REGISTRY_ATTRS = [REGISTRY, HOME, AUTH, ALWAYS_AUTH];
-const NRMRC = path.join(process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'], '.nrmrc');
-const NPMRC = path.join(process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'], '.npmrc');
+const NRMRC = path.join(process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'], '.nrmrc');
+const NPMRC = path.join(process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'], '.npmrc');
 
 module.exports = {
   NRMRC,
