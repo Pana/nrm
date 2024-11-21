@@ -59,7 +59,7 @@ async function onUse(name) {
   if (name === undefined) {
     name = await select({
       message: 'Please select the registry you want to use',
-      choices: Object.keys(registries),
+      choices: Object.keys(registries).map((registry) => ({ name: registry, value: registry })),
     });
   }
 
