@@ -21,9 +21,9 @@ async function onList() {
   const currentRegistry = await getCurrentRegistry();
   const registries = await getRegistries();
   const keys = Object.keys(registries);
-  const length = Math.max(...keys.map(key => key.length)) + 3;
+  const length = Math.max(...keys.map((key) => key.length)) + 3;
 
-  const messages = keys.map(key => {
+  const messages = keys.map((key) => {
     const registry = registries[key];
     const prefix = isLowerCaseEqual(registry[REGISTRY], currentRegistry) ? chalk.green.bold('* ') : '  ';
     return prefix + key + geneDashLine(key, length) + registry[REGISTRY];
@@ -65,7 +65,7 @@ async function onUse(name) {
 }
 
 async function onDelete(name) {
-  if (await isRegistryNotFound(name) || await isInternalRegistry(name, 'delete')) {
+  if ((await isRegistryNotFound(name)) || (await isInternalRegistry(name, 'delete'))) {
     return;
   }
 
@@ -84,9 +84,11 @@ async function onDelete(name) {
 async function onAdd(name, url, home) {
   const registries = await getRegistries();
   const registryNames = Object.keys(registries);
-  const registryUrls = registryNames.map(name => registries[name][REGISTRY]);
-  if (registryNames.includes(name) || registryUrls.some(eachUrl => isLowerCaseEqual(eachUrl, url))) {
-    return exit('The registry name or url is already included in the nrm registries. Please make sure that the name and url are unique.');
+  const registryUrls = registryNames.map((name) => registries[name][REGISTRY]);
+  if (registryNames.includes(name) || registryUrls.some((eachUrl) => isLowerCaseEqual(eachUrl, url))) {
+    return exit(
+      'The registry name or url is already included in the nrm registries. Please make sure that the name and url are unique.',
+    );
   }
 
   const newRegistry = {};
@@ -101,7 +103,7 @@ async function onAdd(name, url, home) {
 }
 
 async function onLogin(name, base64, { alwaysAuth, username, password, email }) {
-  if (await isRegistryNotFound(name) || await isInternalRegistry(name, 'set authorization information of')) {
+  if ((await isRegistryNotFound(name)) || (await isInternalRegistry(name, 'set authorization information of'))) {
     return;
   }
 
@@ -130,16 +132,19 @@ async function onLogin(name, base64, { alwaysAuth, username, password, email }) 
   const currentRegistry = await getCurrentRegistry();
   if (currentRegistry === registry[REGISTRY]) {
     const npmrc = await readFile(NPMRC);
-    await writeFile(NPMRC, Object.assign(npmrc, {
-      [AUTH]: registry[AUTH],
-      [ALWAYS_AUTH]: registry[ALWAYS_AUTH],
-      [EMAIL]: registry[EMAIL],
-    }));
+    await writeFile(
+      NPMRC,
+      Object.assign(npmrc, {
+        [AUTH]: registry[AUTH],
+        [ALWAYS_AUTH]: registry[ALWAYS_AUTH],
+        [EMAIL]: registry[EMAIL],
+      }),
+    );
   }
 }
 
 async function onSetRepository(name, repo) {
-  if (await isRegistryNotFound(name) || await isInternalRegistry(name, 'set repository of')) {
+  if ((await isRegistryNotFound(name)) || (await isInternalRegistry(name, 'set repository of'))) {
     return;
   }
 
@@ -177,7 +182,7 @@ async function onDeleteScope(scopeName) {
 }
 
 async function onSetAttribute(name, { attr, value }) {
-  if (await isRegistryNotFound(name) || await isInternalRegistry(name, 'set attribute of')) {
+  if ((await isRegistryNotFound(name)) || (await isInternalRegistry(name, 'set attribute of'))) {
     return;
   }
 
@@ -198,14 +203,14 @@ async function onSetAttribute(name, { attr, value }) {
 }
 
 async function onRename(name, newName) {
-  if (await isRegistryNotFound(name) || await isInternalRegistry(name, 'rename')) {
+  if ((await isRegistryNotFound(name)) || (await isInternalRegistry(name, 'rename'))) {
     return;
   }
   if (name === newName) {
     return exit('The names cannot be the same.');
   }
 
-  if (!await isRegistryNotFound(newName, false)) {
+  if (!(await isRegistryNotFound(newName, false))) {
     return exit(`The new registry name '${newName}' is already exist.`);
   }
   const customRegistries = await readFile(NRMRC);
@@ -231,43 +236,48 @@ async function onTest(target) {
   const registries = await getRegistries();
   const timeout = 5000;
 
-  if (target && await isRegistryNotFound(target)) {
+  if (target && (await isRegistryNotFound(target))) {
     return exit();
   }
 
   const sources = target ? { [target]: registries[target] } : registries;
 
-  const results = await Promise.all(Object.keys(sources).map(async name => {
-    const { registry } = sources[name];
-    const start = Date.now();
-    let status = false;
-    let isTimeout = false;
-    try {
-      const response = await fetch(registry + 'nrm', { signal: AbortSignal.timeout(timeout) });
-      status = response.ok;
-    } catch (error) {
-      isTimeout = error.name === 'TimeoutError';
-    }
-    return {
-      name,
-      registry,
-      success: status,
-      time: Date.now() - start,
-      isTimeout
-    };
-  }));
+  const results = await Promise.all(
+    Object.keys(sources).map(async (name) => {
+      const { registry } = sources[name];
+      const start = Date.now();
+      let status = false;
+      let isTimeout = false;
+      try {
+        const response = await fetch(registry + 'nrm', { signal: AbortSignal.timeout(timeout) });
+        status = response.ok;
+      } catch (error) {
+        isTimeout = error.name === 'TimeoutError';
+      }
+      return {
+        name,
+        registry,
+        success: status,
+        time: Date.now() - start,
+        isTimeout,
+      };
+    }),
+  );
 
-  const [fastest] = results.filter(each => each.success).map(each => each.time).sort((a, b) => a - b);
+  const [fastest] = results
+    .filter((each) => each.success)
+    .map((each) => each.time)
+    .sort((a, b) => a - b);
 
   const messages = [];
   const currentRegistry = await getCurrentRegistry();
   const errorMsg = chalk.red(' (Fetch error, if this is your private registry, please ignore)');
   const timeoutMsg = chalk.yellow(` (Fetch timeout over ${timeout} ms)`);
-  const length = Math.max(...Object.keys(sources).map(key => key.length)) + 3;
+  const length = Math.max(...Object.keys(sources).map((key) => key.length)) + 3;
   results.forEach(({ registry, success, time, name, isTimeout }) => {
     const isFastest = time === fastest;
     const prefix = registry === currentRegistry ? chalk.green('* ') : '  ';
-    let suffix = (isFastest && !target) ? chalk.bgGreenBright(time + ' ms') : isTimeout ? 'timeout' : `${time} ms`;
+    let suffix = isFastest && !target ? chalk.bgGreenBright(time + ' ms') : isTimeout ? 'timeout' : `${time} ms`;
     if (!success) {
       suffix += isTimeout ? timeoutMsg : errorMsg;
     }

@@ -1,5 +1,5 @@
 name: Unit Test(Windows)
-on: 
+on:
   pull_request:
     branches: [master]
 jobs:

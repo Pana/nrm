@@ -11,23 +11,23 @@ let mockedFiles = Object.create(null);
 
 function writeFileSync(path, content) {
   mockedFiles[path] = content;
-};
+}
 
-jest.mock("fs", () => {
+jest.mock('fs', () => {
   const originalModule = jest.requireActual('fs');
 
   function readFileSync(path) {
     return mockedFiles[path];
-  };
+  }
 
   /* for jest scope, so same to above */
   function writeFileSync(path, content) {
     mockedFiles[path] = content;
-  };
+  }
 
   function existsSync(path) {
     return path in mockedFiles;
-  };
+  }
 
   return {
     ...originalModule,
