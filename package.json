@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/Pana/nrm",
   "dependencies": {
-    "@inquirer/prompts": "^7.1.0",
+    "@inquirer/select": "^4.0.2",
     "chalk": "^4.1.2",
     "commander": "^8.3.0",
     "ini": "^2.0.0",

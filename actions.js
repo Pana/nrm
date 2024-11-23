@@ -1,6 +1,6 @@
 const open = require('open');
 const chalk = require('chalk');
-const { select } = require('@inquirer/prompts');
+const select = require('@inquirer/select').default;
 const { fetch } = require('undici');
 const {
   exit,

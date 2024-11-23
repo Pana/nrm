@@ -1,9 +1,10 @@
 const coffee = require('coffee');
 const open = require('open');
 const chalk = require('chalk');
-
-const { onHome, onTest } = require('.././actions.js');
-
+const { render } = require('@inquirer/testing');
+const { onHome, onTest, onUse } = require('.././actions.js');
+const { spawn } = require('node:child_process');
+const stripAnsi = require('strip-ansi');
 const isWin = process.platform === 'win32';
 
 jest.setTimeout(20000);
@@ -56,6 +57,26 @@ it('nrm use <registry>', async () => {
     .expect('stdout', /The registry has been changed to 'cnpm'/g)
     .expect('code', 0)
     .end();
+});
+
+it('nrm use without argument', async () => {
+  const { stdout } = spawn('nrm', ['use'], { shell: isWin });
+
+  const message = await new Promise((resolve) => {
+    stdout.on('data', (data) => {
+      resolve(stripAnsi(data.toString()).trim());
+    });
+  });
+
+  expect(message).toBe(`? Please select the registry you want to use (Use arrow keys)
+❯ npm
+  yarn
+  tencent
+  cnpm
+  taobao
+  npmMirror
+  huawei`);
+
 });
 
 it('nrm current', async () => {
