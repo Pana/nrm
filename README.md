@@ -48,9 +48,10 @@ Usage: nrm [options] [command]
 
     ls                                    List all the registries
     current                               Show current registry name
+      -u  --show-url                        Show the registry URL instead of the name
     use <registry>                        Change registry to registry
     add <registry> <url> [home]           Add one custom registry
-    login <registry> [value]              Set authorize information for a registry with a base64 encoded string or username and pasword
+    login <registry> [value]              Set authorize information for a registry with a base64 encoded string or username and password
       -a  --always-auth                     Set is always auth
       -u  --username <username>             Your user name for this registry
       -p  --password <password>             Your password for this registry
@@ -59,8 +60,8 @@ Usage: nrm [options] [command]
     set-scope <scopeName> <value>         Associating a scope with a registry
     del-scope <scopeName>                 Remove a scope
     set <registryName>                    Set custom registry attribute
-      -a  --attr <attr>                    Set custorm registry attribute
-      -v  --value <value>                  Set custorm registry value
+      -a  --attr <attr>                    Set custom registry attribute
+      -v  --value <value>                  Set custom registry value
     del <registry>                        Delete one custom registry
     rename <registryName> <newName>       Set custom registry name
     home <registry> [browser]             Open the homepage of registry with optional browser
@@ -97,7 +98,7 @@ Usage: nrm [options] [command]
 ## Notice
 
 When you are using preset registries the `publish` command will proxy to the npm official registry.
-When you are using a custom registry you will need to run the `set-hosted-repo` to set a url to publish pacakges to your hosted registry.
+When you are using a custom registry you will need to run the `set-hosted-repo` to set a url to publish packages to your hosted registry.
 
 ## Maintainer is wanted
 
