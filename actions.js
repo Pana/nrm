@@ -34,21 +34,23 @@ async function onList() {
 
 async function onCurrent({ showUrl }) {
   const currentRegistry = await getCurrentRegistry();
-  let usingUnknownRegistry = true;
   const registries = await getRegistries();
-  for (const name in registries) {
-    const registry = registries[name];
-    if (isLowerCaseEqual(registry[REGISTRY], currentRegistry)) {
-      usingUnknownRegistry = false;
-      printMessages([`You are using ${chalk.green(showUrl ? registry[REGISTRY] : name)} registry.`]);
-    }
-  }
-  if (usingUnknownRegistry) {
+
+  const matchedRegistry = Object.entries(registries).find(([_name, registry]) =>
+    isLowerCaseEqual(registry[REGISTRY], currentRegistry),
+  );
+
+  // not find equal registry
+  if (!matchedRegistry) {
     printMessages([
       `Your current registry(${currentRegistry}) is not included in the nrm registries.`,
       `Use the ${chalk.green('nrm add <registry> <url> [home]')} command to add your registry.`,
     ]);
+    return;
   }
+
+  const [name, registry] = matchedRegistry;
+  printMessages([`You are using ${chalk.green(showUrl ? registry[REGISTRY] : name)} registry.`]);
 }
 
 async function onUse(name) {
