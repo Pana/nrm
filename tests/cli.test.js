@@ -1,8 +1,7 @@
 const coffee = require('coffee');
 const open = require('open');
 const chalk = require('chalk');
-const { render } = require('@inquirer/testing');
-const { onHome, onTest, onUse } = require('.././actions.js');
+const { onHome, onTest } = require('.././actions.js');
 const { spawn } = require('node:child_process');
 const stripAnsi = require('strip-ansi');
 const isWin = process.platform === 'win32';
@@ -69,7 +68,7 @@ it('nrm use without argument', async () => {
   });
 
   expect(message).toBe(`? Please select the registry you want to use (Use arrow keys)
-❯ npm
+${isWin ? '>' : '❯'} npm
   yarn
   tencent
   cnpm
