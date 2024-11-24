@@ -9,6 +9,14 @@
     "type": "git",
     "url": "git://github.com/Pana/nrm.git"
   },
+  "files": [
+    "cli.js",
+    "actions.js",
+    "constants.js",
+    "helpers.js",
+    "process.js",
+    "registries.json"
+  ],
   "scripts": {
     "star": "npm star nrm",
     "test": "jest",
