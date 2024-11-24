@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/Pana/nrm.git"
+    "url": "git+https://github.com/Pana/nrm.git"
   },
   "scripts": {
     "star": "npm star nrm",
