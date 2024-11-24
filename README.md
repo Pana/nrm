@@ -42,7 +42,7 @@ $ nrm use cnpm  //switch registry to cnpm
 ## Usage
 
 > [!TIP]
-> The lowest node version is ***18*** from ***v1.3.2***.
+> The lowest node version is ***18*** from ***v1.4.0***.
 
 ```
 Usage: nrm [options] [command]
