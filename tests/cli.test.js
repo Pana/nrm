@@ -75,7 +75,6 @@ ${isWin ? '>' : '❯'} npm
   taobao
   npmMirror
   huawei`);
-
 });
 
 it('nrm current', async () => {
