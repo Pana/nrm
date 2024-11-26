@@ -2,6 +2,7 @@ const open = require('open');
 const chalk = require('chalk');
 const select = require('@inquirer/select').default;
 const { fetch } = require('undici');
+const path = require('path');
 const {
   exit,
   readFile,
@@ -15,6 +16,7 @@ const {
   isRegistryNotFound,
   isInternalRegistry,
 } = require('./helpers');
+const process = require('./process');
 
 const { NRMRC, NPMRC, AUTH, EMAIL, ALWAYS_AUTH, REPOSITORY, REGISTRY, HOME } = require('./constants');
 
@@ -54,7 +56,7 @@ async function onCurrent({ showUrl }) {
   printMessages([`You are using ${chalk.green(showUrl ? registry[REGISTRY] : name)} registry.`]);
 }
 
-async function onUse(name) {
+async function onUse(name, { local }) {
   const registries = await getRegistries();
 
   // if name is undefined, select the registry alias from list
@@ -70,8 +72,17 @@ async function onUse(name) {
   }
 
   const registry = registries[name];
-  const npmrc = await readFile(NPMRC);
-  await writeFile(NPMRC, Object.assign(npmrc, registry));
+
+  if (local) {
+    // switch local registry
+    const localNPMRCPath = path.resolve(process.cwd(), '.npmrc');
+    const npmrc = await readFile(localNPMRCPath);
+    await writeFile(localNPMRCPath, Object.assign(npmrc, registry));
+  } else {
+    // switch global registry
+    const npmrc = await readFile(NPMRC);
+    await writeFile(NPMRC, Object.assign(npmrc, registry));
+  }
 
   printSuccess(`The registry has been changed to '${name}'.`);
 }

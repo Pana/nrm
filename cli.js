@@ -14,7 +14,11 @@ program
   .description('Show current registry name or URL')
   .action(actions.onCurrent);
 
-program.command('use [name]').description('Change current registry').action(actions.onUse);
+program
+  .command('use [name]')
+  .description('Change current registry')
+  .option('-l, --local', 'Switch local registry')
+  .action(actions.onUse);
 
 program.command('add <name> <url> [home]').description('Add custom registry').action(actions.onAdd);
 
