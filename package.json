@@ -20,6 +20,7 @@
   "scripts": {
     "star": "npm star nrm",
     "test": "jest",
+    "test:watch": "jest --watch",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "format": "prettier . --write"
