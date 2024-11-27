@@ -1,7 +1,6 @@
 const fs = require('fs');
 const ini = require('ini');
 const chalk = require('chalk');
-const process = require('./process');
 
 const { NRMRC, NPMRC, REGISTRY, REGISTRIES } = require('./constants');
 

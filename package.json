@@ -14,7 +14,6 @@
     "actions.js",
     "constants.js",
     "helpers.js",
-    "process.js",
     "registries.json"
   ],
   "scripts": {
