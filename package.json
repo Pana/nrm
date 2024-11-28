@@ -16,9 +16,9 @@
   ],
   "scripts": {
     "star": "npm star nrm",
-    "test": "jest",
+    "test": "vitest run",
     "build": "tsup",
-    "test:watch": "jest --watch",
+    "test:watch": "vitest",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "check": "npx @biomejs/biome check --write ."
@@ -47,10 +47,10 @@
     "@changesets/cli": "^2.27.8",
     "@types/ini": "^4.1.1",
     "coffee": "^5.4.0",
-    "jest": "^27.4.0",
     "mock-fs": "^5.4.1",
     "tsup": "8.3.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "2.1.6"
   },
   "engines": {
     "node": ">=18"

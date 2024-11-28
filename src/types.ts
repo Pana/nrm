@@ -3,6 +3,13 @@ export interface Registry {
   registry: string;
 }
 
-export type RegistryAlias = 'npm' | 'yarn' | 'tencent' | 'cnpm' | 'taobao' | 'npmMirror' | 'huawei'
+export type RegistryAlias =
+  | 'npm'
+  | 'yarn'
+  | 'tencent'
+  | 'cnpm'
+  | 'taobao'
+  | 'npmMirror'
+  | 'huawei';
 
-export type RegistryConfig = Record<RegistryAlias, Registry>
+export type RegistryConfig = Record<RegistryAlias, Registry>;
