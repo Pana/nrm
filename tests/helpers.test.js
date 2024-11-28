@@ -1,48 +1,21 @@
 const ini = require('ini');
 const chalk = require('chalk');
+const fs = require('fs');
+const mockFs = require('mock-fs');
 
 const helpers = require('.././helpers');
 
 const { NPMRC, NRMRC, REGISTRY } = require('.././constants');
 
-// ========== mock `fs` within helpers.js ==========
-
-let mockedFiles = Object.create(null);
-
-function writeFileSync(path, content) {
-  mockedFiles[path] = content;
-}
-
-jest.mock('fs', () => {
-  const originalModule = jest.requireActual('fs');
-
-  function readFileSync(path) {
-    return mockedFiles[path];
-  }
-
-  /* for jest scope, so same to above */
-  function writeFileSync(path, content) {
-    mockedFiles[path] = content;
-  }
-
-  function existsSync(path) {
-    return path in mockedFiles;
-  }
-
-  return {
-    ...originalModule,
-    existsSync: jest.fn(existsSync),
-    readFileSync: jest.fn(readFileSync),
-    writeFileSync: jest.fn(writeFileSync),
-  };
+beforeEach(() => {
+  mockFs({
+    [NPMRC]: '',
+    [NRMRC]: '',
+  });
 });
 
-// ========== test cases ==========
-
-beforeEach(() => {
-  mockedFiles = Object.create(null);
-  mockedFiles[NPMRC] = '';
-  mockedFiles[NRMRC] = '';
+afterEach(() => {
+  mockFs.restore();
 });
 
 it('geneDashLine', () => {
@@ -54,7 +27,7 @@ it('geneDashLine', () => {
 
 it('getCurrentRegistry', async () => {
   const registry = ' https://registry.npmjs.org/';
-  writeFileSync(NPMRC, ini.stringify({ [REGISTRY]: registry }));
+  fs.writeFileSync(NPMRC, ini.stringify({ [REGISTRY]: registry }));
   const currentRegistry = await helpers.getCurrentRegistry();
   expect(currentRegistry).toBe(registry);
 });
@@ -62,14 +35,14 @@ it('getCurrentRegistry', async () => {
 it('getRegistries', async () => {
   const name = 'fake name';
   const registry = 'https://registry.example.com/';
-  writeFileSync(NRMRC, ini.stringify({ [name]: { registry } }));
+  fs.writeFileSync(NRMRC, ini.stringify({ [name]: { registry } }));
   const registries = await helpers.getRegistries();
   expect(Object.keys(registries).includes(name)).toBe(true);
 });
 
 it('readFile', async () => {
   const content = 'hello nrm';
-  writeFileSync(NRMRC, ini.stringify({ content: content }));
+  fs.writeFileSync(NRMRC, ini.stringify({ content: content }));
   const result1 = await helpers.readFile(NRMRC);
   const result2 = await helpers.readFile('file not exist');
   expect(result1.content).toBe(content);
@@ -98,7 +71,7 @@ it('isRegistryNotFound', async () => {
   const unknown = 'unknown';
   const name = 'custom name';
   const registry = 'https://registry.example.com/';
-  writeFileSync(NRMRC, ini.stringify({ [name]: registry }));
+  fs.writeFileSync(NRMRC, ini.stringify({ [name]: registry }));
   const result1 = await helpers.isRegistryNotFound(unknown, false);
   const result2 = await helpers.isRegistryNotFound(name, false);
   expect(result1).toBe(true);
@@ -108,7 +81,7 @@ it('isRegistryNotFound', async () => {
 it('isInternalRegistry', async () => {
   const name = 'custom name';
   const registry = 'https://registry.example.com/';
-  writeFileSync(NRMRC, ini.stringify({ [name]: registry }));
+  fs.writeFileSync(NRMRC, ini.stringify({ [name]: registry }));
   const result1 = await helpers.isInternalRegistry(name);
   const result2 = await helpers.isInternalRegistry('npm');
   expect(result1).toBe(false);
