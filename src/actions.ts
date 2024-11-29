@@ -123,7 +123,7 @@ export async function onAdd(name: string, url: string, home?: string) {
     );
   }
 
-  const newRegistry = {};
+  const newRegistry: Record<string, string | undefined> = {};
   newRegistry[REGISTRY] = /\/$/.test(url) ? url : `${url}/`;
   if (home) {
     newRegistry[HOME] = home;
@@ -327,7 +327,7 @@ export async function onTest(target?: string) {
           signal: AbortSignal.timeout(timeout),
         });
         status = response.ok;
-      } catch (error) {
+      } catch (error: any) {
         isTimeout = error.name === 'TimeoutError';
       }
       return {
