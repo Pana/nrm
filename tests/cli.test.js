@@ -4,6 +4,8 @@ const chalk = require('chalk');
 const { onHome, onTest } = require('.././actions.js');
 const { spawn } = require('node:child_process');
 const stripAnsi = require('strip-ansi');
+const { readFile, writeFile } = require('.././helpers');
+const { NPMRC, REGISTRIES } = require('.././constants');
 const isWin = process.platform === 'win32';
 
 jest.setTimeout(20000);
@@ -56,6 +58,37 @@ it('nrm use <registry>', async () => {
     .expect('stdout', /The registry has been changed to 'cnpm'/g)
     .expect('code', 0)
     .end();
+});
+
+it('nrm use <registry> local', async () => {
+  await coffee
+    .spawn('nrm', ['use', 'cnpm', 'local'], { shell: isWin })
+    .expect('stdout', /The registry has been changed to 'cnpm'/g)
+    .expect('code', 0)
+    .end();
+
+  const npmrc = await readFile(NPMRC, { encoding: 'utf-8' });
+
+  expect(npmrc.registry).toBe(REGISTRIES.cnpm.registry);
+
+  await coffee.spawn('nrm', ['current'], { shell: isWin }).expect('stdout', /cnpm/g).expect('code', 0).end();
+});
+
+it('nrm use <registry> local with user config', async () => {
+  await writeFile(NPMRC, { abc: '123' });
+
+  await coffee
+    .spawn('nrm', ['use', 'cnpm', 'local'], { shell: isWin })
+    .expect('stdout', /The registry has been changed to 'cnpm'/g)
+    .expect('code', 0)
+    .end();
+
+  const npmrc = await readFile(NPMRC, { encoding: 'utf-8' });
+
+  expect(npmrc.registry).toBe(REGISTRIES.cnpm.registry);
+  expect(npmrc.abc).toBe('123');
+
+  await coffee.spawn('nrm', ['current'], { shell: isWin }).expect('stdout', /cnpm/g).expect('code', 0).end();
 });
 
 it('nrm use without argument', async () => {
