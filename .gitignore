@@ -3,7 +3,7 @@ TODO.md
 
 # package lock
 package-lock.json
-pnpm-lock.yaml
+yarn.lock
 
 # Output of 'npm pack'
 *.tgz
@@ -45,3 +45,4 @@ lerna-debug.log*
 *.gz
 .DS_Store
 results
+dist

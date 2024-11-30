@@ -1,39 +1,50 @@
-const open = require('open');
-const chalk = require('chalk');
-const select = require('@inquirer/select').default;
-const { fetch } = require('undici');
-const {
+import select from '@inquirer/select';
+import chalk from 'chalk';
+import open from 'open';
+import { fetch } from 'undici';
+import {
+  ALWAYS_AUTH,
+  AUTH,
+  EMAIL,
+  HOME,
+  NPMRC,
+  NRMRC,
+  REGISTRY,
+  REPOSITORY,
+} from './constants';
+import {
   exit,
-  readFile,
-  writeFile,
   geneDashLine,
-  printMessages,
-  printSuccess,
   getCurrentRegistry,
   getRegistries,
+  isInternalRegistry,
   isLowerCaseEqual,
   isRegistryNotFound,
-  isInternalRegistry,
-} = require('./helpers');
+  printMessages,
+  printSuccess,
+  readFile,
+  writeFile,
+} from './helpers';
 
-const { NRMRC, NPMRC, AUTH, EMAIL, ALWAYS_AUTH, REPOSITORY, REGISTRY, HOME } = require('./constants');
-
-async function onList() {
+export async function onList() {
   const currentRegistry = await getCurrentRegistry();
   const registries = await getRegistries();
+
   const keys = Object.keys(registries);
   const length = Math.max(...keys.map((key) => key.length)) + 3;
 
   const messages = keys.map((key) => {
     const registry = registries[key];
-    const prefix = isLowerCaseEqual(registry[REGISTRY], currentRegistry) ? chalk.green.bold('* ') : '  ';
+    const prefix = isLowerCaseEqual(registry[REGISTRY], currentRegistry)
+      ? chalk.green.bold('* ')
+      : '  ';
     return prefix + key + geneDashLine(key, length) + registry[REGISTRY];
   });
 
   printMessages(messages);
 }
 
-async function onCurrent({ showUrl }) {
+export async function onCurrent({ showUrl }: { showUrl: boolean }) {
   const currentRegistry = await getCurrentRegistry();
   const registries = await getRegistries();
 
@@ -51,33 +62,39 @@ async function onCurrent({ showUrl }) {
   }
 
   const [name, registry] = matchedRegistry;
-  printMessages([`You are using ${chalk.green(showUrl ? registry[REGISTRY] : name)} registry.`]);
+  printMessages([
+    `You are using ${chalk.green(showUrl ? registry[REGISTRY] : name)} registry.`,
+  ]);
 }
 
-async function onUse(name) {
+export async function onUse(name: string) {
   const registries = await getRegistries();
+  let alias = name;
 
-  // if name is undefined, select the registry alias from list
-  if (name === undefined) {
-    name = await select({
+  // if alias is undefined, select the registry alias from list
+  if (alias === undefined) {
+    alias = await select({
       message: 'Please select the registry you want to use',
       choices: Object.keys(registries),
     });
   }
 
-  if (await isRegistryNotFound(name)) {
+  if (await isRegistryNotFound(alias)) {
     return;
   }
 
-  const registry = registries[name];
+  const registry = registries[alias];
   const npmrc = await readFile(NPMRC);
   await writeFile(NPMRC, Object.assign(npmrc, registry));
 
-  printSuccess(`The registry has been changed to '${name}'.`);
+  printSuccess(`The registry has been changed to '${alias}'.`);
 }
 
-async function onDelete(name) {
-  if ((await isRegistryNotFound(name)) || (await isInternalRegistry(name, 'delete'))) {
+export async function onDelete(name: string) {
+  if (
+    (await isRegistryNotFound(name)) ||
+    (await isInternalRegistry(name, 'delete'))
+  ) {
     return;
   }
 
@@ -93,29 +110,48 @@ async function onDelete(name) {
   }
 }
 
-async function onAdd(name, url, home) {
+export async function onAdd(name: string, url: string, home?: string) {
   const registries = await getRegistries();
   const registryNames = Object.keys(registries);
   const registryUrls = registryNames.map((name) => registries[name][REGISTRY]);
-  if (registryNames.includes(name) || registryUrls.some((eachUrl) => isLowerCaseEqual(eachUrl, url))) {
+  if (
+    registryNames.includes(name) ||
+    registryUrls.some((eachUrl) => isLowerCaseEqual(eachUrl, url))
+  ) {
     return exit(
       'The registry name or url is already included in the nrm registries. Please make sure that the name and url are unique.',
     );
   }
 
-  const newRegistry = {};
-  newRegistry[REGISTRY] = /\/$/.test(url) ? url : url + '/';
+  const newRegistry: Record<string, string | undefined> = {};
+  newRegistry[REGISTRY] = /\/$/.test(url) ? url : `${url}/`;
   if (home) {
     newRegistry[HOME] = home;
   }
   const customRegistries = await readFile(NRMRC);
-  const newCustomRegistries = Object.assign(customRegistries, { [name]: newRegistry });
+  const newCustomRegistries = Object.assign(customRegistries, {
+    [name]: newRegistry,
+  });
   await writeFile(NRMRC, newCustomRegistries);
-  printSuccess(`Add registry ${name} success, run ${chalk.green('nrm use ' + name)} command to use ${name} registry.`);
+  printSuccess(
+    `Add registry ${name} success, run ${chalk.green(`nrm use ${name}`)} command to use ${name} registry.`,
+  );
 }
 
-async function onLogin(name, base64, { alwaysAuth, username, password, email }) {
-  if ((await isRegistryNotFound(name)) || (await isInternalRegistry(name, 'set authorization information of'))) {
+export async function onLogin(
+  name: string,
+  base64: string,
+  {
+    alwaysAuth,
+    username,
+    password,
+    email,
+  }: { alwaysAuth: boolean; username: string; password: string; email: string },
+) {
+  if (
+    (await isRegistryNotFound(name)) ||
+    (await isInternalRegistry(name, 'set authorization information of'))
+  ) {
     return;
   }
 
@@ -126,7 +162,9 @@ async function onLogin(name, base64, { alwaysAuth, username, password, email }) 
   } else if (username && password) {
     registry[AUTH] = Buffer.from(`${username}:${password}`).toString('base64');
   } else {
-    return exit('Authorization information in base64 format or username & password is required');
+    return exit(
+      'Authorization information in base64 format or username & password is required',
+    );
   }
 
   if (alwaysAuth) {
@@ -139,7 +177,9 @@ async function onLogin(name, base64, { alwaysAuth, username, password, email }) 
 
   Object.assign(customRegistries, { [name]: registry });
   await writeFile(NRMRC, customRegistries);
-  printSuccess(`Set the authorization information of the registry '${name}' success.`);
+  printSuccess(
+    `Set the authorization information of the registry '${name}' success.`,
+  );
 
   const currentRegistry = await getCurrentRegistry();
   if (currentRegistry === registry[REGISTRY]) {
@@ -155,8 +195,11 @@ async function onLogin(name, base64, { alwaysAuth, username, password, email }) 
   }
 }
 
-async function onSetRepository(name, repo) {
-  if ((await isRegistryNotFound(name)) || (await isInternalRegistry(name, 'set repository of'))) {
+export async function onSetRepository(name: string, repo: string) {
+  if (
+    (await isRegistryNotFound(name)) ||
+    (await isInternalRegistry(name, 'set repository of'))
+  ) {
     return;
   }
 
@@ -171,11 +214,11 @@ async function onSetRepository(name, repo) {
     const npmrc = await readFile(NPMRC);
     Object.assign(npmrc, { [REPOSITORY]: repo });
     await writeFile(NPMRC, npmrc);
-    printSuccess(`Set repository attribute of npmrc successfully`);
+    printSuccess('Set repository attribute of npmrc successfully');
   }
 }
 
-async function onSetScope(scopeName, url) {
+export async function onSetScope(scopeName: string, url: string) {
   const scopeRegistryKey = `${scopeName}:${REGISTRY}`;
   const npmrc = await readFile(NPMRC);
   Object.assign(npmrc, { [scopeRegistryKey]: url });
@@ -183,7 +226,7 @@ async function onSetScope(scopeName, url) {
   printSuccess(`Set scope '${scopeRegistryKey}=${url}' success.`);
 }
 
-async function onDeleteScope(scopeName) {
+export async function onDeleteScope(scopeName: string) {
   const scopeRegistryKey = `${scopeName}:${REGISTRY}`;
   const npmrc = await readFile(NPMRC);
   if (npmrc[scopeRegistryKey]) {
@@ -193,19 +236,29 @@ async function onDeleteScope(scopeName) {
   }
 }
 
-async function onSetAttribute(name, { attr, value }) {
-  if ((await isRegistryNotFound(name)) || (await isInternalRegistry(name, 'set attribute of'))) {
+export async function onSetAttribute(
+  name: string,
+  { attr, value }: { attr: string; value: string },
+) {
+  if (
+    (await isRegistryNotFound(name)) ||
+    (await isInternalRegistry(name, 'set attribute of'))
+  ) {
     return;
   }
 
   if (REPOSITORY === attr) {
-    return exit(`Use the ${chalk.green('nrm set-hosted-repo <name> <repo>')} command to set repository.`);
+    return exit(
+      `Use the ${chalk.green('nrm set-hosted-repo <name> <repo>')} command to set repository.`,
+    );
   }
   const customRegistries = await readFile(NRMRC);
   const registry = customRegistries[name];
   Object.assign(registry, { [attr]: value });
   await writeFile(NRMRC, customRegistries);
-  printSuccess(`Set attribute '${attr}=${value}' of the registry '${name}' successfully.`);
+  printSuccess(
+    `Set attribute '${attr}=${value}' of the registry '${name}' successfully.`,
+  );
 
   const currentRegistry = await getCurrentRegistry();
   if (currentRegistry === registry[REGISTRY]) {
@@ -214,10 +267,14 @@ async function onSetAttribute(name, { attr, value }) {
   }
 }
 
-async function onRename(name, newName) {
-  if ((await isRegistryNotFound(name)) || (await isInternalRegistry(name, 'rename'))) {
+export async function onRename(name: string, newName: string) {
+  if (
+    (await isRegistryNotFound(name)) ||
+    (await isInternalRegistry(name, 'rename'))
+  ) {
     return;
   }
+
   if (name === newName) {
     return exit('The names cannot be the same.');
   }
@@ -226,13 +283,15 @@ async function onRename(name, newName) {
     return exit(`The new registry name '${newName}' is already exist.`);
   }
   const customRegistries = await readFile(NRMRC);
-  customRegistries[newName] = JSON.parse(JSON.stringify(customRegistries[name]));
+  customRegistries[newName] = JSON.parse(
+    JSON.stringify(customRegistries[name]),
+  );
   delete customRegistries[name];
   await writeFile(NRMRC, customRegistries);
   printSuccess(`The registry '${name}' has been renamed to '${newName}'.`);
 }
 
-async function onHome(name, browser) {
+export async function onHome(name: string, browser?: string) {
   if (await isRegistryNotFound(name)) {
     return;
   }
@@ -241,10 +300,13 @@ async function onHome(name, browser) {
   if (!registries[name][HOME]) {
     return exit(`The homepage of registry '${name}' is not found.`);
   }
-  open(registries[name][HOME], browser ? { app: { name: browser } } : undefined);
+  open(
+    registries[name][HOME],
+    browser ? { app: { name: browser } } : undefined,
+  );
 }
 
-async function onTest(target) {
+export async function onTest(target?: string) {
   const registries = await getRegistries();
   const timeout = 5000;
 
@@ -261,9 +323,11 @@ async function onTest(target) {
       let status = false;
       let isTimeout = false;
       try {
-        const response = await fetch(registry + 'nrm', { signal: AbortSignal.timeout(timeout) });
+        const response = await fetch(`${registry}nrm`, {
+          signal: AbortSignal.timeout(timeout),
+        });
         status = response.ok;
-      } catch (error) {
+      } catch (error: any) {
         isTimeout = error.name === 'TimeoutError';
       }
       return {
@@ -281,36 +345,29 @@ async function onTest(target) {
     .map((each) => each.time)
     .sort((a, b) => a - b);
 
-  const messages = [];
+  const messages: string[] = [];
   const currentRegistry = await getCurrentRegistry();
-  const errorMsg = chalk.red(' (Fetch error, if this is your private registry, please ignore)');
+  const errorMsg = chalk.red(
+    ' (Fetch error, if this is your private registry, please ignore)',
+  );
   const timeoutMsg = chalk.yellow(` (Fetch timeout over ${timeout} ms)`);
   const length = Math.max(...Object.keys(sources).map((key) => key.length)) + 3;
-  results.forEach(({ registry, success, time, name, isTimeout }) => {
+
+  for (const { registry, success, time, name, isTimeout } of results) {
     const isFastest = time === fastest;
     const prefix = registry === currentRegistry ? chalk.green('* ') : '  ';
-    let suffix = isFastest && !target ? chalk.bgGreenBright(time + ' ms') : isTimeout ? 'timeout' : `${time} ms`;
+    let suffix =
+      isFastest && !target
+        ? chalk.bgGreenBright(`${time} ms`)
+        : isTimeout
+          ? 'timeout'
+          : `${time} ms`;
     if (!success) {
       suffix += isTimeout ? timeoutMsg : errorMsg;
     }
     messages.push(prefix + name + geneDashLine(name, length) + suffix);
-  });
+  }
+
   printMessages(messages);
   return messages;
 }
-
-module.exports = {
-  onList,
-  onCurrent,
-  onUse,
-  onAdd,
-  onDelete,
-  onRename,
-  onHome,
-  onSetRepository,
-  onSetScope,
-  onDeleteScope,
-  onSetAttribute,
-  onTest,
-  onLogin,
-};
