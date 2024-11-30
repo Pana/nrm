@@ -3,10 +3,8 @@ import chalk from 'chalk';
 import ini from 'ini';
 import mockFs from 'mock-fs';
 import { afterAll, beforeAll, expect, it } from 'vitest';
+import { NPMRC, NRMRC, REGISTRY } from '../src/constants';
 import {
-  NPMRC,
-  NRMRC,
-  REGISTRY,
   geneDashLine,
   getCurrentRegistry,
   getRegistries,
@@ -15,7 +13,7 @@ import {
   isRegistryNotFound,
   readFile,
   writeFile,
-} from '../dist/index';
+} from '../src/helpers';
 
 beforeAll(() => {
   mockFs({

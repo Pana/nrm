@@ -311,7 +311,7 @@ export async function onTest(target?: string) {
   const timeout = 5000;
 
   if (target && (await isRegistryNotFound(target))) {
-    return exit();
+    exit();
   }
 
   const sources = target ? { [target]: registries[target] } : registries;
@@ -369,5 +369,6 @@ export async function onTest(target?: string) {
   }
 
   printMessages(messages);
+
   return messages;
 }

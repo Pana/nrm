@@ -2,8 +2,8 @@ import fs from 'node:fs';
 import process from 'node:process';
 import chalk from 'chalk';
 import ini from 'ini';
-import { NPMRC, NRMRC, REGISTRIES, REGISTRY } from './constants';
-import type { Registry } from './types';
+import { NPMRC, NRMRC, REGISTRIES, REGISTRY } from './constants.js';
+import type { Registry } from './types.js';
 
 export async function readFile(
   file: fs.PathLike,
@@ -92,7 +92,7 @@ export async function isRegistryNotFound(name: string, printErr = true) {
   return false;
 }
 
-export async function isInternalRegistry(name: string, handle: string) {
+export async function isInternalRegistry(name: string, handle?: string) {
   if (Object.keys(REGISTRIES).includes(name)) {
     handle && printError(`You cannot ${handle} the nrm internal registry.`);
     return true;

@@ -1,21 +1,35 @@
-const coffee = require('coffee');
-const open = require('open');
-const chalk = require('chalk');
-const { onHome, onTest } = require('../dist/index');
-const { spawn } = require('node:child_process');
-const stripAnsi = require('strip-ansi');
+import { spawn } from 'node:child_process';
+import chalk from 'chalk';
+import coffee from 'coffee';
+import open from 'open';
+import stripAnsi from 'strip-ansi';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
+
+import { onHome, onTest } from '../src/actions';
+
 const isWin = process.platform === 'win32';
 
-jest.setTimeout(20000);
-jest.mock('open', () => {
-  return jest.fn(() => {
-    console.log('browser opened');
-  });
+vi.setConfig({
+  testTimeout: 20000,
+});
+vi.mock('open', () => {
+  return {
+    default: vi.fn(() => console.log('browser opened')),
+  };
 });
 
-jest.mock('undici', () => {
+vi.mock('undici', () => {
   return {
-    fetch: jest.fn((url) => {
+    fetch: vi.fn((url) => {
       return new Promise((resolve) => {
         setTimeout(
           () => resolve({ ok: !url.includes('error.com') }),
@@ -26,17 +40,22 @@ jest.mock('undici', () => {
   };
 });
 
+vi.stubGlobal('__NRM_VERSION__', null);
+vi.stubGlobal('__REGISTRY__', null);
 beforeAll(async () => {
   const { stdout } = await coffee.spawn('nrm', ['-V'], { shell: isWin }).end();
-  __NRM_VERSION__ = stdout ? stdout : null;
+  global.__NRM_VERSION__ = stdout ? stdout : null;
   await coffee.spawn('npm', ['link'], { shell: isWin }).end();
 });
 
 afterAll(async () => {
   await coffee.spawn('npm', ['unlink', 'nrm', '-g'], { shell: isWin }).end();
-  if (__NRM_VERSION__ !== null) {
+
+  if (global.__NRM_VERSION__ !== null) {
     await coffee
-      .spawn('npm', [`install -g nrm@${__NRM_VERSION__}`], { shell: isWin })
+      .spawn('npm', [`install -g nrm@${global.__NRM_VERSION__}`], {
+        shell: isWin,
+      })
       .end();
   }
 });
@@ -52,7 +71,8 @@ it('nrm ls', async () => {
     .spawn('nrm', ['ls'], { shell: isWin })
     .end();
 
-  const match = `${chalk.green.bold('*·')}cnpm`;
+  const match = `${chalk.green.bold('* ')}cnpm`;
+
   expect(stdout.includes(match)).toBe(true);
   expect(code).toBe(0);
 });
@@ -103,9 +123,8 @@ it('nrm current', async () => {
 describe('nrm command which needs to add a custom registry', () => {
   const customName = 'customName';
   const url = 'https://registry.error.com/';
-
+  let __REGISTRY__ = '';
   beforeEach(async () => {
-    /* the globalVariable in jest.config.js */
     __REGISTRY__ = customName;
 
     await coffee
