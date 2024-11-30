@@ -1,5 +1,15 @@
 # nrm
 
+## 1.5.0
+
+### Minor Changes
+
+- 9f04e63: Added set registry locally. Thanks @chouchouji
+
+### Patch Changes
+
+- 6f54e36: Optimize package files Thanks @chouchouji
+
 ## 1.4.0
 
 ### Minor Changes
