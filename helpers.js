@@ -36,7 +36,7 @@ function padding(message = '', before = 1, after = 1) {
 }
 
 function printSuccess(message) {
-  console.log(chalk.bgGreenBright(padding('SUCCESS')) + ' ' + message);
+  console.log(chalk.black.bgGreenBright(padding('SUCCESS')) + ' ' + message);
 }
 
 function printError(error) {
