@@ -9,8 +9,10 @@
     "resolveJsonModule": true,
     "jsx": "preserve",
     "lib": ["esnext"],
-    "module": "esnext",
-    "moduleResolution": "node"
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "rootDir": "./src"
   },
   "include": ["src"],
   "exclude": ["node_modules"]

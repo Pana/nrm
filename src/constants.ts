@@ -1,6 +1,6 @@
 import os from 'node:os';
 import path from 'node:path';
-import type { RegistryConfig } from './types';
+import type { RegistryConfig } from './types.js';
 
 export const REGISTRIES: RegistryConfig = {
   npm: {
