@@ -94,16 +94,15 @@ it('nrm use without argument', async () => {
     });
   });
 
-  expect(
-    message,
-  ).toBe(`? Please select the registry you want to use (Use arrow keys)
+  expect(message).toBe(`? Please select the registry you want to use
 ${isWin ? '>' : '❯'} npm
   yarn
   tencent
   cnpm
   taobao
   npmMirror
-  huawei`);
+  huawei
+(Use arrow keys to reveal more choices)`);
 });
 
 it('nrm current', async () => {
