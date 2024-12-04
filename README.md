@@ -25,10 +25,11 @@ $ nrm ls
 
 * npm ---------- https://registry.npmjs.org/
   yarn --------- https://registry.yarnpkg.com/
-  tencent ------ https://mirrors.cloud.tencent.com/npm/
+  tencent ------ https://mirrors.tencent.com/npm/
   cnpm --------- https://r.cnpmjs.org/
   taobao ------- https://registry.npmmirror.com/
   npmMirror ---- https://skimdb.npmjs.com/registry/
+  huawei ------- https://repo.huaweicloud.com/repository/npm/
 
 ```
 
@@ -109,11 +110,15 @@ When you are using a custom registry you will need to run the `set-hosted-repo` 
 If you find nrm is useful and is a experienced node.js developer, then you can help maintain nrm.
 If you have the interest you can reach me through email: pana.wang@outlook.com
 
-## Contributors 
+## Contributors
 
-* [EmilyMew](https://github.com/EmilyMew)
+<a href="https://github.com/Pana/nrm/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Pana/nrm" />
+</a>
+
 
 ## LICENSE
+
 MIT
 
 
