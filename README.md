@@ -1,22 +1,27 @@
 nrm -- npm registry manager
 ===
 
-[![npm version][npm-image]][npm-url]
+<p>
+  <img src="https://img.shields.io/github/package-json/v/Pana/nrm" alt="version">
+  <img src="https://img.shields.io/github/stars/Pana/nrm" alt="stars">
+  <img src="https://img.shields.io/github/license/Pana/nrm" alt="license">
+</p>
 
-`nrm` can help you easy and fast switch between different npm registries,
-now include: `npm`, `cnpm`, `taobao`, `nj(nodejitsu)`.
-
-## How to configure yarn to use private registry ?
-just add .yarnrc in your project’s directory and write there:
-`registry “http://your.registry”`
-
-Or you can configure it in your HOME directory's .yarnrc
+`nrm` can help you switch different npm registries easily and quickly. It supports
+`npm`, `cnpm`, `taobao`, `yarn`, `tencent`, `npmMirror` and `huawei`.
 
 
 ## Install
 
 ```
-$ npm install -g nrm
+# npm
+npm install -g nrm
+
+# yarn 
+yarn global add nrm
+
+# pnpm
+pnpm add -g nrm
 ```
 
 ## Example
@@ -34,10 +39,9 @@ $ nrm ls
 ```
 
 ```
-$ nrm use cnpm  //switch registry to cnpm
+$ nrm use taobao
 
-    Registry has been set to: http://r.cnpmjs.org/
-
+SUCCESS The registry has been changed to 'taobao'.
 ```
 
 ## Usage
@@ -76,7 +80,7 @@ Usage: nrm [options] [command]
       -o  --otp [otpcode]                    Set otpcode
       -dr --dry-run                          Set is dry run
     test [registry]                       Show the response time for one or all registries
-    help                                  Print this help
+    help [command]                        Display help for command
 
   Options:
 
@@ -88,9 +92,18 @@ Usage: nrm [options] [command]
 
 * [npm](https://www.npmjs.org)
 * [yarn](https://yarnpkg.com)
+* [tencent](https://mirrors.tencent.com)
 * [cnpm](http://cnpmjs.org)
-* [nodejitsu](https://www.nodejitsu.com)
+* [npmMirror](https://skimdb.npmjs.com/)
 * [taobao](https://npmmirror.com)
+* [huawei](https://www.huaweicloud.com/special/npm-jingxiang.html)
+
+## How to configure yarn to use private registry ?
+
+just add .yarnrc in your project’s directory and write there:
+`registry "http://your.registry"`
+
+Or you can configure it in your HOME directory's .yarnrc
 
 ## Related Projects
 
@@ -103,12 +116,14 @@ Usage: nrm [options] [command]
 ## Notice
 
 When you are using preset registries the `publish` command will proxy to the npm official registry.
+
 When you are using a custom registry you will need to run the `set-hosted-repo` to set a url to publish packages to your hosted registry.
 
 ## Maintainer is wanted
 
-If you find nrm is useful and is a experienced node.js developer, then you can help maintain nrm.
-If you have the interest you can reach me through email: pana.wang@outlook.com
+If you find nrm is useful and are an experienced node.js developer, then you can help maintain nrm.
+
+If you have the interest, you can reach me through email: pana.wang@outlook.com
 
 ## Contributors
 
@@ -116,11 +131,6 @@ If you have the interest you can reach me through email: pana.wang@outlook.com
   <img src="https://contrib.rocks/image?repo=Pana/nrm" />
 </a>
 
-
 ## LICENSE
 
-MIT
-
-
-[npm-image]: https://img.shields.io/npm/v/nrm.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/nrm
+[MIT](LICENSE)
