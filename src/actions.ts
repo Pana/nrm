@@ -1,3 +1,4 @@
+import checkbox from '@inquirer/checkbox';
 import select from '@inquirer/select';
 import chalk from 'chalk';
 import open from 'open';
@@ -91,23 +92,43 @@ export async function onUse(name: string) {
   printSuccess(`The registry has been changed to '${alias}'.`);
 }
 
-export async function onDelete(name: string) {
-  if (
-    (await isRegistryNotFound(name)) ||
-    (await isInternalRegistry(name, 'delete'))
-  ) {
-    return;
+export async function onDelete(name: string | undefined) {
+  const customRegistries = await readFile(NRMRC);
+
+  const keys: string[] = [];
+  if (name) {
+    keys.push(name);
   }
 
-  const customRegistries = await readFile(NRMRC);
-  const registry = customRegistries[name];
-  delete customRegistries[name];
-  await writeFile(NRMRC, customRegistries);
-  printSuccess(`The registry '${name}' has been deleted successfully.`);
+  if (name === undefined) {
+    if (Object.keys(customRegistries).length) {
+      const selectedKeys = await await checkbox<string>({
+        message: 'Please select the registries you want to delete',
+        choices: Object.keys(customRegistries),
+      });
+      keys.push(...selectedKeys);
+    } else {
+      printMessages(['No any custom registries can be deleted.']);
+    }
+  }
 
-  const currentRegistry = await getCurrentRegistry();
-  if (currentRegistry === registry[REGISTRY]) {
-    await onUse('npm');
+  for (const key of keys) {
+    if (
+      (await isRegistryNotFound(key)) ||
+      (await isInternalRegistry(key, 'delete'))
+    ) {
+      continue;
+    }
+
+    const registry = customRegistries[key];
+    delete customRegistries[key];
+    await writeFile(NRMRC, customRegistries);
+    printSuccess(`The registry '${key}' has been deleted successfully.`);
+
+    const currentRegistry = await getCurrentRegistry();
+    if (currentRegistry === registry[REGISTRY]) {
+      await onUse('npm');
+    }
   }
 }
 
