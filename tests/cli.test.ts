@@ -15,6 +15,8 @@ import {
 } from 'vitest';
 
 import { onHome, onTest } from '../src/actions';
+import { readFile, writeFile } from '../src/helpers';
+import { NPMRC, REGISTRIES } from '../src/constants';
 
 const isWin = process.platform === 'win32';
 
@@ -92,7 +94,7 @@ it('nrm use <registry> local', async () => {
     .expect('code', 0)
     .end();
 
-  const npmrc = await readFile(NPMRC, { encoding: 'utf-8' });
+  const npmrc = await readFile(NPMRC);
 
   expect(npmrc.registry).toBe(REGISTRIES.cnpm.registry);
 
@@ -108,7 +110,7 @@ it('nrm use <registry> local with user config', async () => {
     .expect('code', 0)
     .end();
 
-  const npmrc = await readFile(NPMRC, { encoding: 'utf-8' });
+  const npmrc = await readFile(NPMRC);
 
   expect(npmrc.registry).toBe(REGISTRIES.cnpm.registry);
   expect(npmrc.abc).toBe('123');
