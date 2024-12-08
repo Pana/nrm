@@ -9,7 +9,8 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      - name: Set Pnpm
+        uses: pnpm/action-setup@v4
         with:
           version: 9
 

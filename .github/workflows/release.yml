@@ -14,6 +14,11 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+      
+      - name: Set Pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Setup Node.js 20.x
         uses: actions/setup-node@v4
@@ -21,10 +26,10 @@ jobs:
           node-version: 20.x
 
       - name: Install Dependencies
-        run: pnpm
+        run: pnpm i
       
       - name: Build
-        run: pnpm run build
+        run: pnpm build
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
