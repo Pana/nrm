@@ -15,8 +15,8 @@ import {
 } from 'vitest';
 
 import { onHome, onTest } from '../src/actions';
-import { readFile, writeFile } from '../src/helpers';
 import { NPMRC, REGISTRIES } from '../src/constants';
+import { readFile, writeFile } from '../src/helpers';
 
 const isWin = process.platform === 'win32';
 
@@ -98,7 +98,11 @@ it('nrm use <registry> local', async () => {
 
   expect(npmrc.registry).toBe(REGISTRIES.cnpm.registry);
 
-  await coffee.spawn('nrm', ['current'], { shell: isWin }).expect('stdout', /cnpm/g).expect('code', 0).end();
+  await coffee
+    .spawn('nrm', ['current'], { shell: isWin })
+    .expect('stdout', /cnpm/g)
+    .expect('code', 0)
+    .end();
 });
 
 it('nrm use <registry> local with user config', async () => {
@@ -115,7 +119,11 @@ it('nrm use <registry> local with user config', async () => {
   expect(npmrc.registry).toBe(REGISTRIES.cnpm.registry);
   expect(npmrc.abc).toBe('123');
 
-  await coffee.spawn('nrm', ['current'], { shell: isWin }).expect('stdout', /cnpm/g).expect('code', 0).end();
+  await coffee
+    .spawn('nrm', ['current'], { shell: isWin })
+    .expect('stdout', /cnpm/g)
+    .expect('code', 0)
+    .end();
 });
 
 it('nrm use without argument', async () => {
@@ -127,7 +135,9 @@ it('nrm use without argument', async () => {
     });
   });
 
-  expect(message).toBe(`? Please select the registry you want to use (Use arrow keys)
+  expect(
+    message,
+  ).toBe(`? Please select the registry you want to use (Use arrow keys)
 ${isWin ? '>' : '❯'} npm
   yarn
   tencent
