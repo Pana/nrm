@@ -25,7 +25,7 @@ jobs:
           version: 9
 
       - name: Install Dependencies
-        run: pnpm
+        run: pnpm install
 
       - name: Build
         run: pnpm run build
