@@ -1,6 +1,6 @@
 {
   "name": "nrm",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "description": "npm registry manager can help you switch different npm registries easily and quickly",
   "bin": {
     "nrm": "dist/index.js"
