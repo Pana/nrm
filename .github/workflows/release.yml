@@ -20,9 +20,13 @@ jobs:
         with:
           node-version: 20.x
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Install Dependencies
         run: pnpm
-      
+
       - name: Build
         run: pnpm run build
 
