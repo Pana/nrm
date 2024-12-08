@@ -76,6 +76,7 @@ export async function onUse(name: string) {
     alias = await select({
       message: 'Please select the registry you want to use',
       choices: Object.keys(registries),
+      pageSize: 10,
     });
   }
 

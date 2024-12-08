@@ -127,15 +127,14 @@ it('nrm use without argument', async () => {
     });
   });
 
-  expect(message).toBe(`? Please select the registry you want to use
+  expect(message).toBe(`? Please select the registry you want to use (Use arrow keys)
 ${isWin ? '>' : '❯'} npm
   yarn
   tencent
   cnpm
   taobao
   npmMirror
-  huawei
-(Use arrow keys to reveal more choices)`);
+  huawei`);
 });
 
 it('nrm current', async () => {
