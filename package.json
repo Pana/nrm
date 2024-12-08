@@ -3,27 +3,24 @@
   "version": "1.5.0",
   "description": "npm registry manager can help you switch different npm registries easily and quickly",
   "bin": {
-    "nrm": "cli.js"
+    "nrm": "dist/index.js"
   },
+  "type": "commonjs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Pana/nrm.git"
   },
   "files": [
-    "cli.js",
-    "actions.js",
-    "constants.js",
-    "helpers.js",
-    "process.js",
-    "registries.json"
+    "dist"
   ],
   "scripts": {
-    "star": "npm star nrm",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "clean": "rimraf node_modules dist",
+    "test": "pnpm build && vitest run",
+    "build": "rimraf dist && tsc && rimraf dist/types.js",
+    "test:watch": "vitest",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
-    "format": "prettier . --write"
+    "check": "biome check --write ."
   },
   "keywords": [
     "npm",
@@ -37,18 +34,23 @@
   "homepage": "https://github.com/Pana/nrm",
   "dependencies": {
     "@inquirer/select": "^4.0.2",
-    "chalk": "^4.1.2",
+    "chalk": "4.1.2",
     "commander": "^8.3.0",
-    "ini": "^2.0.0",
-    "open": "^8.4.2",
+    "ini": "4.1.3",
+    "open": "8.4.2",
     "undici": "5.28.2"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@changesets/cli": "^2.27.8",
+    "@types/ini": "^4.1.1",
+    "@types/node": "18",
     "coffee": "^5.4.0",
-    "jest": "^27.4.0",
     "mock-fs": "^5.4.1",
-    "prettier": "^3.3.3"
+    "rimraf": "^6.0.1",
+    "strip-ansi": "^7.1.0",
+    "typescript": "^5.7.2",
+    "vitest": "2.1.6"
   },
   "engines": {
     "node": ">=18"
