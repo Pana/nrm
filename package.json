@@ -16,6 +16,7 @@
   "scripts": {
     "clean": "rimraf node_modules dist",
     "test": "pnpm build && vitest run",
+    "dev": "tsc --watch",
     "build": "rimraf dist && tsc && rimraf dist/types.js",
     "test:watch": "vitest",
     "changeset:version": "changeset version",
