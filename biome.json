@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false,
+    "ignoreUnknown": true,
     "ignore": ["dist", "*.json"]
   },
   "formatter": {
