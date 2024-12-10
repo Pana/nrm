@@ -1,3 +1,4 @@
+import checkbox from '@inquirer/checkbox';
 import select from '@inquirer/select';
 import chalk from 'chalk';
 import open from 'open';
@@ -56,14 +57,18 @@ export async function onCurrent({ showUrl }: { showUrl: boolean }) {
   if (!matchedRegistry) {
     printMessages([
       `Your current registry(${currentRegistry}) is not included in the nrm registries.`,
-      `Use the ${chalk.green('nrm add <registry> <url> [home]')} command to add your registry.`,
+      `Use the ${chalk.green(
+        'nrm add <registry> <url> [home]',
+      )} command to add your registry.`,
     ]);
     return;
   }
 
   const [name, registry] = matchedRegistry;
   printMessages([
-    `You are using ${chalk.green(showUrl ? registry[REGISTRY] : name)} registry.`,
+    `You are using ${chalk.green(
+      showUrl ? registry[REGISTRY] : name,
+    )} registry.`,
   ]);
 }
 
@@ -73,7 +78,7 @@ export async function onUse(name: string) {
 
   // if alias is undefined, select the registry alias from list
   if (alias === undefined) {
-    alias = await select({
+    alias = await select<string>({
       message: 'Please select the registry you want to use',
       choices: Object.keys(registries),
       pageSize: 10,
@@ -91,23 +96,45 @@ export async function onUse(name: string) {
   printSuccess(`The registry has been changed to '${alias}'.`);
 }
 
-export async function onDelete(name: string) {
-  if (
-    (await isRegistryNotFound(name)) ||
-    (await isInternalRegistry(name, 'delete'))
-  ) {
+export async function onDelete(name: string | undefined) {
+  const customRegistries = await readFile(NRMRC);
+
+  const deleteKeys: string[] = [];
+  if (name) {
+    deleteKeys.push(name);
+  }
+
+  const choices = Object.keys(customRegistries);
+  if (name === undefined && !choices.length) {
+    printMessages(['No any custom registries can be deleted.']);
     return;
   }
 
-  const customRegistries = await readFile(NRMRC);
-  const registry = customRegistries[name];
-  delete customRegistries[name];
-  await writeFile(NRMRC, customRegistries);
-  printSuccess(`The registry '${name}' has been deleted successfully.`);
+  if (name === undefined) {
+    const selectedKeys = await checkbox<string>({
+      message: 'Please select the registries you want to delete',
+      choices,
+    });
+    deleteKeys.push(...selectedKeys);
+  }
 
-  const currentRegistry = await getCurrentRegistry();
-  if (currentRegistry === registry[REGISTRY]) {
-    await onUse('npm');
+  for (const key of deleteKeys) {
+    if (
+      (await isRegistryNotFound(key)) ||
+      (await isInternalRegistry(key, 'delete'))
+    ) {
+      continue;
+    }
+
+    const registry = customRegistries[key];
+    delete customRegistries[key];
+    await writeFile(NRMRC, customRegistries);
+    printSuccess(`The registry '${key}' has been deleted successfully.`);
+
+    const currentRegistry = await getCurrentRegistry();
+    if (currentRegistry === registry[REGISTRY]) {
+      await onUse('npm');
+    }
   }
 }
 
@@ -135,7 +162,9 @@ export async function onAdd(name: string, url: string, home?: string) {
   });
   await writeFile(NRMRC, newCustomRegistries);
   printSuccess(
-    `Add registry ${name} success, run ${chalk.green(`nrm use ${name}`)} command to use ${name} registry.`,
+    `Add registry ${name} success, run ${chalk.green(
+      `nrm use ${name}`,
+    )} command to use ${name} registry.`,
   );
 }
 
@@ -250,7 +279,9 @@ export async function onSetAttribute(
 
   if (REPOSITORY === attr) {
     return exit(
-      `Use the ${chalk.green('nrm set-hosted-repo <name> <repo>')} command to set repository.`,
+      `Use the ${chalk.green(
+        'nrm set-hosted-repo <name> <repo>',
+      )} command to set repository.`,
     );
   }
   const customRegistries = await readFile(NRMRC);

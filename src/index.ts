@@ -82,7 +82,7 @@ program
   .action(onRename);
 
 program
-  .command('del <name>')
+  .command('del [name]')
   .description('Delete custom registry')
   .action(onDelete);
 
