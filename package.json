@@ -16,11 +16,12 @@
   "scripts": {
     "clean": "rimraf node_modules dist",
     "test": "pnpm build && vitest run",
+    "dev": "tsc --watch",
     "build": "rimraf dist && tsc && rimraf dist/types.js",
     "test:watch": "vitest",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
-    "check": "biome check --write ."
+    "check": "biome check --write --verbose"
   },
   "keywords": [
     "npm",
