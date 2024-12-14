@@ -106,7 +106,7 @@ export function exit(error?: string) {
 
 export function isUnicodeSupported() {
   if (process.platform !== 'win32') {
-    return process.env['TERM'] !== 'linux';
+    return process.env.TERM !== 'linux';
   }
 
   return (
