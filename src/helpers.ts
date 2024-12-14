@@ -53,9 +53,7 @@ export function printError(error: string) {
 }
 
 export function printMessages(messages: string[]) {
-  for (const message of messages) {
-    console.log(message);
-  }
+  console.log(messages.join('\n'));
 }
 
 export function geneDashLine(message: string, length: number) {
@@ -104,4 +102,21 @@ export async function isInternalRegistry(name: string, handle?: string) {
 export function exit(error?: string) {
   error && printError(error);
   process.exit(1);
+}
+
+export function isUnicodeSupported() {
+  if (process.platform !== 'win32') {
+    return process.env['TERM'] !== 'linux';
+  }
+
+  return (
+    Boolean(process.env.WT_SESSION) ||
+    Boolean(process.env.TERMINUS_SUBLIME) ||
+    process.env.ConEmuTask === '{cmd::Cmder}' ||
+    process.env.TERM_PROGRAM === 'Terminus-Sublime' ||
+    process.env.TERM_PROGRAM === 'vscode' ||
+    process.env.TERM === 'xterm-256color' ||
+    process.env.TERM === 'alacritty' ||
+    process.env.TERMINAL_EMULATOR === 'JetBrains-JediTerm'
+  );
 }

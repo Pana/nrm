@@ -14,11 +14,18 @@ import {
   vi,
 } from 'vitest';
 
+import { unlink } from 'node:fs/promises';
 import { onHome, onTest } from '../src/actions';
-import { NPMRC, REGISTRIES } from '../src/constants';
-import { readFile, writeFile } from '../src/helpers';
+import { NPMRC, NRMRC, REGISTRIES } from '../src/constants';
+import { isUnicodeSupported, readFile, writeFile } from '../src/helpers';
 
 const isWin = process.platform === 'win32';
+
+const shouldUseMain = isUnicodeSupported();
+
+const pointer = shouldUseMain ? '❯' : '>';
+const radioOff = shouldUseMain ? '◯' : '( )';
+const radioOn = shouldUseMain ? '◉' : '(*)';
 
 vi.setConfig({
   testTimeout: 20000,
@@ -138,7 +145,7 @@ it('nrm use without argument', async () => {
   expect(
     message,
   ).toBe(`? Please select the registry you want to use (Use arrow keys)
-${isWin ? '>' : '❯'} npm
+${pointer} npm
   yarn
   tencent
   cnpm
@@ -280,4 +287,69 @@ describe('nrm command which needs to add a custom registry', () => {
 it('nrm home <registry> [browser]', async () => {
   await onHome('cnpm');
   expect(open).toHaveBeenCalled();
+});
+
+describe('nrm delete without argument (use keyword to select delete)', () => {
+  const registries = [
+    { name: 'test', url: 'http://localhost:3000' },
+    { name: 'test1', url: 'http://localhost:3001' },
+    { name: 'test2', url: 'http://localhost:3002' },
+  ];
+  beforeEach(async () => {
+    for (const registry of registries) {
+      await coffee
+        .spawn('nrm', ['add', `${registry.name}`, `${registry.url}`], {
+          shell: isWin,
+        })
+        .expect('stdout', /success/g)
+        .expect('code', 0)
+        .end();
+    }
+  });
+
+  afterEach(async () => {
+    await unlink(NRMRC);
+  });
+
+  it('nrm delete', async () => {
+    const { stdout } = spawn('nrm', ['del'], { shell: isWin });
+
+    const message = await new Promise((resolve) => {
+      stdout.on('data', (data) => {
+        resolve(stripAnsi(data.toString()).trim());
+      });
+    });
+
+    expect(message).toMatchInlineSnapshot(`
+      "? Please select the registries you want to delete (Press <space> to select, <a>
+      to toggle all, <i> to invert selection, and <enter> to proceed)
+      ${pointer}${radioOff} test
+       ${radioOff} test1
+       ${radioOff} test2"
+    `);
+  });
+
+  it('nrm delete (with keyword input)', async () => {
+    const { stdout, stdin } = spawn('nrm', ['del'], { shell: isWin });
+    stdin.write('\u001b[B');
+
+    const message = await new Promise((resolve) => {
+      const m: string[] = [];
+      stdout.on('data', (data) => {
+        m.push(stripAnsi(data.toString()).trim());
+        // get the last output
+        if (m.length === 2) {
+          resolve(m[m.length - 1]);
+        }
+      });
+    });
+
+    expect(message).toMatchInlineSnapshot(`
+      "? Please select the registries you want to delete (Press <space> to select, <a>
+      to toggle all, <i> to invert selection, and <enter> to proceed)
+       ${radioOff} test
+      ${pointer}${radioOff} test1
+       ${radioOff} test2"
+    `);
+  });
 });
