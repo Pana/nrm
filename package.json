@@ -21,7 +21,7 @@
     "test:watch": "vitest",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
-    "check": "biome check --write ."
+    "check": "biome check --write --verbose"
   },
   "keywords": [
     "npm",
