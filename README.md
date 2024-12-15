@@ -71,7 +71,7 @@ Usage: nrm [options] [command]
     set <registryName>                    Set custom registry attribute
       -a  --attr <attr>                    Set custom registry attribute
       -v  --value <value>                  Set custom registry value
-    del <registry>                        Delete one custom registry
+    del [registry]                        Delete one custom registry
     rename <registryName> <newName>       Set custom registry name
     home <registry> [browser]             Open the homepage of registry with optional browser
     publish [<tarball>|<folder>]          Publish package to current registry if current registry is a custom registry. The field 'repository' of current custom registry is required running this command. If you're not using custom registry, this command will run npm publish directly
