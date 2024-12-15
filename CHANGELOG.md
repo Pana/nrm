@@ -1,5 +1,11 @@
 # nrm
 
+## 2.0.1
+
+### Patch Changes
+
+- 19eff3c: Added delete multiple registry. Thanks @chouchouji
+
 ## 2.0.0
 
 ### Major Changes
