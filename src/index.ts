@@ -3,6 +3,7 @@
 import { Command } from 'commander';
 import packageJson from '../package.json';
 import {
+  cleanInvalidNpmConfig,
   onAdd,
   onCurrent,
   onDelete,
@@ -16,7 +17,6 @@ import {
   onSetScope,
   onTest,
   onUse,
-  cleanInvalidNpmConfig,
 } from './actions.js';
 
 async function main() {

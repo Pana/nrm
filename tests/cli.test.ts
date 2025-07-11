@@ -19,7 +19,6 @@ import { onHome, onTest } from '../src/actions';
 import { NPMRC, NRMRC, REGISTRIES } from '../src/constants';
 import { isUnicodeSupported, readFile, writeFile } from '../src/helpers';
 
-
 const isWin = process.platform === 'win32';
 
 const shouldUseMain = isUnicodeSupported();

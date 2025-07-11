@@ -95,7 +95,7 @@ export async function onUse(name: string) {
     return;
   }
   // https://github.com/Pana/nrm/pull/223#issuecomment-3057092705
-  const {home:_, ...registry} = registries[alias];
+  const { home: _, ...registry } = registries[alias];
   const npmrc = await readFile(NPMRC);
   await writeFile(NPMRC, Object.assign(npmrc, registry));
 
