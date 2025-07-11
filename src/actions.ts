@@ -29,6 +29,7 @@ import {
 
 export async function cleanInvalidNpmConfig() {
   const npmrc = await readFile(NPMRC);
+  if (!npmrc) return;
   delete npmrc.home;
   await writeFile(NPMRC, npmrc);
 }
