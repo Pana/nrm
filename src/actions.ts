@@ -27,6 +27,13 @@ import {
   writeFile,
 } from './helpers';
 
+export async function cleanInvalidNpmConfig() {
+  const npmrc = await readFile(NPMRC);
+  if (!npmrc) return;
+  delete npmrc.home;
+  await writeFile(NPMRC, npmrc);
+}
+
 export async function onList() {
   const currentRegistry = await getCurrentRegistry();
   const registries = await getRegistries();
@@ -88,8 +95,8 @@ export async function onUse(name: string) {
   if (await isRegistryNotFound(alias)) {
     return;
   }
-
-  const registry = registries[alias];
+  // https://github.com/Pana/nrm/pull/223#issuecomment-3057092705
+  const { home: _, ...registry } = registries[alias];
   const npmrc = await readFile(NPMRC);
   await writeFile(NPMRC, Object.assign(npmrc, registry));
 
