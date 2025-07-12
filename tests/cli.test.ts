@@ -105,14 +105,13 @@ it('nrm use <registry> local with user config', async () => {
 });
 
 it('nrm use without argument', async () => {
-  const { stdout } = fork(LOCAL_NRM, ['use']);
+  const { stdout } = fork(LOCAL_NRM, ['use'], { stdio: 'pipe' });
 
   const message = await new Promise((resolve) => {
     stdout?.on('data', (data) => {
       resolve(stripAnsi(data.toString()).trim());
     });
   });
-
   expect(
     message,
   ).toBe(`? Please select the registry you want to use (Use arrow keys)
@@ -285,7 +284,7 @@ describe('nrm delete without argument (use keyword to select delete)', () => {
   });
 
   it('nrm delete', async () => {
-    const { stdout } = fork(LOCAL_NRM, ['del']);
+    const { stdout } = fork(LOCAL_NRM, ['del'], { stdio: 'pipe' });
 
     const message = await new Promise((resolve) => {
       stdout?.on('data', (data) => {
@@ -303,7 +302,7 @@ describe('nrm delete without argument (use keyword to select delete)', () => {
   });
 
   it('nrm delete (with keyword input)', async () => {
-    const { stdout, stdin } = fork(LOCAL_NRM, ['del']);
+    const { stdout, stdin } = fork(LOCAL_NRM, ['del'], { stdio: 'pipe' });
     stdin?.write('\u001b[B');
 
     const message = await new Promise((resolve) => {
