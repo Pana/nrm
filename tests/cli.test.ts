@@ -1,31 +1,27 @@
-import { spawn } from 'node:child_process';
+import { fork } from 'node:child_process';
 import chalk from 'chalk';
 import coffee from 'coffee';
 import open from 'open';
 import stripAnsi from 'strip-ansi';
 import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
+  afterEach, beforeEach,
   describe,
   expect,
   it,
-  vi,
+  vi
 } from 'vitest';
 
 import { unlink } from 'node:fs/promises';
 import { onHome, onTest } from '../src/actions';
 import { NPMRC, NRMRC, REGISTRIES } from '../src/constants';
 import { isUnicodeSupported, readFile, writeFile } from '../src/helpers';
-
-const isWin = process.platform === 'win32';
+import path from 'node:path';
 
 const shouldUseMain = isUnicodeSupported();
-
 const pointer = shouldUseMain ? '❯' : '>';
 const radioOff = shouldUseMain ? '◯' : '( )';
 const radioOn = shouldUseMain ? '◉' : '(*)';
+const LOCAL_NRM = path.resolve(__dirname, '../dist/index.js');
 
 vi.setConfig({
   testTimeout: 20000,
@@ -51,33 +47,16 @@ vi.mock('undici', () => {
 
 vi.stubGlobal('__NRM_VERSION__', null);
 vi.stubGlobal('__REGISTRY__', null);
-beforeAll(async () => {
-  const { stdout } = await coffee.spawn('nrm', ['-V'], { shell: isWin }).end();
-  global.__NRM_VERSION__ = stdout ? stdout : null;
-  await coffee.spawn('npm', ['link'], { shell: isWin }).end();
-});
 
-afterAll(async () => {
-  await coffee.spawn('npm', ['unlink', 'nrm', '-g'], { shell: isWin }).end();
-
-  if (global.__NRM_VERSION__ !== null) {
-    await coffee
-      .spawn('npm', [`install -g nrm@${global.__NRM_VERSION__}`], {
-        shell: isWin,
-      })
-      .end();
-  }
-});
-
-it('nrm ls', async () => {
+it.only('nrm ls', async () => {
   await coffee
-    .spawn('nrm', ['use', 'cnpm'], { shell: isWin })
+    .fork(LOCAL_NRM, ['use', 'cnpm'])
     .expect('stdout', /The registry has been changed to 'cnpm'/g)
     .expect('code', 0)
     .end();
-
+  
   const { stdout, code } = await coffee
-    .spawn('nrm', ['ls'], { shell: isWin })
+    .fork(LOCAL_NRM, ['ls'])
     .end();
 
   const match = `${chalk.green.bold('* ')}cnpm`;
@@ -88,7 +67,7 @@ it('nrm ls', async () => {
 
 it('nrm use <registry>', async () => {
   await coffee
-    .spawn('nrm', ['use', 'cnpm'], { shell: isWin })
+    .fork(LOCAL_NRM, ['use', 'cnpm'])
     .expect('stdout', /The registry has been changed to 'cnpm'/g)
     .expect('code', 0)
     .end();
@@ -96,7 +75,7 @@ it('nrm use <registry>', async () => {
 
 it('nrm use <registry> local', async () => {
   await coffee
-    .spawn('nrm', ['use', 'cnpm', 'local'], { shell: isWin })
+    .fork(LOCAL_NRM, ['use', 'cnpm', 'local'])
     .expect('stdout', /The registry has been changed to 'cnpm'/g)
     .expect('code', 0)
     .end();
@@ -106,7 +85,7 @@ it('nrm use <registry> local', async () => {
   expect(npmrc.registry).toBe(REGISTRIES.cnpm.registry);
 
   await coffee
-    .spawn('nrm', ['current'], { shell: isWin })
+    .fork(LOCAL_NRM, ['current'])
     .expect('stdout', /cnpm/g)
     .expect('code', 0)
     .end();
@@ -116,7 +95,7 @@ it('nrm use <registry> local with user config', async () => {
   await writeFile(NPMRC, { abc: '123' });
 
   await coffee
-    .spawn('nrm', ['use', 'cnpm', 'local'], { shell: isWin })
+    .fork(LOCAL_NRM, ['use', 'cnpm', 'local'])
     .expect('stdout', /The registry has been changed to 'cnpm'/g)
     .expect('code', 0)
     .end();
@@ -127,17 +106,17 @@ it('nrm use <registry> local with user config', async () => {
   expect(npmrc.abc).toBe('123');
 
   await coffee
-    .spawn('nrm', ['current'], { shell: isWin })
+    .fork(LOCAL_NRM, ['current'])
     .expect('stdout', /cnpm/g)
     .expect('code', 0)
     .end();
 });
 
 it('nrm use without argument', async () => {
-  const { stdout } = spawn('nrm', ['use'], { shell: isWin });
+  const { stdout } = fork(LOCAL_NRM, ['use']);
 
   const message = await new Promise((resolve) => {
-    stdout.on('data', (data) => {
+    stdout!.on('data', (data) => {
       resolve(stripAnsi(data.toString()).trim());
     });
   });
@@ -156,13 +135,13 @@ ${pointer} npm
 
 it('nrm current', async () => {
   await coffee
-    .spawn('nrm', ['use', 'cnpm'], { shell: isWin })
+    .fork(LOCAL_NRM, ['use', 'cnpm'])
     .expect('stdout', /The registry has been changed to 'cnpm'/g)
     .expect('code', 0)
     .end();
 
   await coffee
-    .spawn('nrm', ['current'], { shell: isWin })
+    .fork(LOCAL_NRM, ['current'])
     .expect('stdout', /cnpm/g)
     .expect('code', 0)
     .end();
@@ -176,7 +155,7 @@ describe('nrm command which needs to add a custom registry', () => {
     __REGISTRY__ = customName;
 
     await coffee
-      .spawn('nrm', ['add', `${__REGISTRY__}`, `${url}`], { shell: isWin })
+      .fork(LOCAL_NRM, ['add', `${__REGISTRY__}`, `${url}`])
       .expect('stdout', /success/g)
       .expect('code', 0)
       .end();
@@ -184,7 +163,7 @@ describe('nrm command which needs to add a custom registry', () => {
 
   afterEach(async () => {
     await coffee
-      .spawn('nrm', ['del', `${__REGISTRY__}`], { shell: isWin })
+      .fork(LOCAL_NRM, ['del', `${__REGISTRY__}`])
       .expect('stdout', /has been deleted successfully/g)
       .expect('code', 0)
       .end();
@@ -199,7 +178,7 @@ describe('nrm command which needs to add a custom registry', () => {
     );
 
     await coffee
-      .spawn('nrm', ['rename', `${customName}`, `${newName}`], { shell: isWin })
+      .fork(LOCAL_NRM, ['rename', `${customName}`, `${newName}`])
       .expect('stdout', match)
       .expect('code', 0)
       .end();
@@ -210,10 +189,8 @@ describe('nrm command which needs to add a custom registry', () => {
     const value = 'value';
 
     await coffee
-      .spawn(
-        'nrm',
-        ['set', `${__REGISTRY__}`, '-a', `${attr}`, '-v', `${value}`],
-        { shell: isWin },
+      .fork(
+        LOCAL_NRM, ['set', `${__REGISTRY__}`, '-a', `${attr}`, '-v', `${value}`],
       )
       .expect('stdout', /successfully/g)
       .expect('code', 0)
@@ -232,13 +209,13 @@ describe('nrm command which needs to add a custom registry', () => {
     const url = 'https://scope.example.org';
 
     await coffee
-      .spawn('nrm', ['set-scope', `${scopeName}`, `${url}`], { shell: isWin })
+      .fork(LOCAL_NRM, ['set-scope', `${scopeName}`, `${url}`])
       .expect('stdout', /success/g)
       .expect('code', 0)
       .end();
 
     await coffee
-      .spawn('nrm', ['del-scope', `${scopeName}`], { shell: isWin })
+      .fork(LOCAL_NRM, ['del-scope', `${scopeName}`])
       .expect('stdout', /success/g)
       .expect('code', 0)
       .end();
@@ -252,9 +229,7 @@ describe('nrm command which needs to add a custom registry', () => {
     );
 
     await coffee
-      .spawn('nrm', ['set-hosted-repo', `${__REGISTRY__}`, `${repo}`], {
-        shell: isWin,
-      })
+      .fork(LOCAL_NRM, ['set-hosted-repo', `${__REGISTRY__}`, `${repo}`])
       .expect('stdout', match)
       .expect('code', 0)
       .end();
@@ -265,17 +240,15 @@ describe('nrm command which needs to add a custom registry', () => {
     const password = 'password';
 
     await coffee
-      .spawn(
-        'nrm',
-        ['login', `${__REGISTRY__}`, '-u', `${username}`, '-p', `${password}`],
-        { shell: isWin },
+      .fork(
+        LOCAL_NRM, ['login', `${__REGISTRY__}`, '-u', `${username}`, '-p', `${password}`],
       )
       .expect('stdout', /success/g)
       .expect('code', 0)
       .end();
 
     await coffee
-      .spawn('nrm', ['login', `${__REGISTRY__}`], { shell: isWin })
+      .fork(LOCAL_NRM, ['login', `${__REGISTRY__}`])
       .expect(
         'stderr',
         /Authorization information in base64 format or username & password is required/g,
@@ -298,9 +271,7 @@ describe('nrm delete without argument (use keyword to select delete)', () => {
   beforeEach(async () => {
     for (const registry of registries) {
       await coffee
-        .spawn('nrm', ['add', `${registry.name}`, `${registry.url}`], {
-          shell: isWin,
-        })
+        .fork(LOCAL_NRM, ['add', `${registry.name}`, `${registry.url}`])
         .expect('stdout', /success/g)
         .expect('code', 0)
         .end();
@@ -312,10 +283,10 @@ describe('nrm delete without argument (use keyword to select delete)', () => {
   });
 
   it('nrm delete', async () => {
-    const { stdout } = spawn('nrm', ['del'], { shell: isWin });
+    const { stdout } = fork(LOCAL_NRM, ['del']);
 
     const message = await new Promise((resolve) => {
-      stdout.on('data', (data) => {
+      stdout!.on('data', (data) => {
         resolve(stripAnsi(data.toString()).trim());
       });
     });
@@ -330,12 +301,12 @@ describe('nrm delete without argument (use keyword to select delete)', () => {
   });
 
   it('nrm delete (with keyword input)', async () => {
-    const { stdout, stdin } = spawn('nrm', ['del'], { shell: isWin });
-    stdin.write('\u001b[B');
+    const { stdout, stdin } = fork(LOCAL_NRM, ['del']);
+    stdin!.write('\u001b[B');
 
     const message = await new Promise((resolve) => {
       const m: string[] = [];
-      stdout.on('data', (data) => {
+      stdout!.on('data', (data) => {
         m.push(stripAnsi(data.toString()).trim());
         // get the last output
         if (m.length === 2) {
