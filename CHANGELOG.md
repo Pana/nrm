@@ -1,5 +1,11 @@
 # nrm
 
+## 2.1.0
+
+### Minor Changes
+
+- 0424253: fix: Remove invalid home field from .npmrc.
+
 ## 2.0.1
 
 ### Patch Changes
