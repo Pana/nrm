@@ -1,5 +1,5 @@
-import { NPMRC } from "../src/constants";
-import { readFile, writeFile } from "../src/helpers";
+import { NPMRC } from '../src/constants';
+import { readFile, writeFile } from '../src/helpers';
 
 export async function setup() {
   const npmrc = await readFile(NPMRC);
@@ -7,5 +7,5 @@ export async function setup() {
     if (npmrc) {
       await writeFile(NPMRC, npmrc);
     }
-  }
+  };
 }

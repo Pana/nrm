@@ -3,19 +3,13 @@ import chalk from 'chalk';
 import coffee from 'coffee';
 import open from 'open';
 import stripAnsi from 'strip-ansi';
-import {
-  afterEach, beforeEach,
-  describe,
-  expect,
-  it,
-  vi
-} from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { unlink } from 'node:fs/promises';
+import path from 'node:path';
 import { onHome, onTest } from '../src/actions';
 import { NPMRC, NRMRC, REGISTRIES } from '../src/constants';
 import { isUnicodeSupported, readFile, writeFile } from '../src/helpers';
-import path from 'node:path';
 
 const shouldUseMain = isUnicodeSupported();
 const pointer = shouldUseMain ? '❯' : '>';
@@ -48,16 +42,14 @@ vi.mock('undici', () => {
 vi.stubGlobal('__NRM_VERSION__', null);
 vi.stubGlobal('__REGISTRY__', null);
 
-it.only('nrm ls', async () => {
+it('nrm ls', async () => {
   await coffee
     .fork(LOCAL_NRM, ['use', 'cnpm'])
     .expect('stdout', /The registry has been changed to 'cnpm'/g)
     .expect('code', 0)
     .end();
-  
-  const { stdout, code } = await coffee
-    .fork(LOCAL_NRM, ['ls'])
-    .end();
+
+  const { stdout, code } = await coffee.fork(LOCAL_NRM, ['ls']).end();
 
   const match = `${chalk.green.bold('* ')}cnpm`;
 
@@ -116,7 +108,7 @@ it('nrm use without argument', async () => {
   const { stdout } = fork(LOCAL_NRM, ['use']);
 
   const message = await new Promise((resolve) => {
-    stdout!.on('data', (data) => {
+    stdout?.on('data', (data) => {
       resolve(stripAnsi(data.toString()).trim());
     });
   });
@@ -189,9 +181,14 @@ describe('nrm command which needs to add a custom registry', () => {
     const value = 'value';
 
     await coffee
-      .fork(
-        LOCAL_NRM, ['set', `${__REGISTRY__}`, '-a', `${attr}`, '-v', `${value}`],
-      )
+      .fork(LOCAL_NRM, [
+        'set',
+        `${__REGISTRY__}`,
+        '-a',
+        `${attr}`,
+        '-v',
+        `${value}`,
+      ])
       .expect('stdout', /successfully/g)
       .expect('code', 0)
       .end();
@@ -240,9 +237,14 @@ describe('nrm command which needs to add a custom registry', () => {
     const password = 'password';
 
     await coffee
-      .fork(
-        LOCAL_NRM, ['login', `${__REGISTRY__}`, '-u', `${username}`, '-p', `${password}`],
-      )
+      .fork(LOCAL_NRM, [
+        'login',
+        `${__REGISTRY__}`,
+        '-u',
+        `${username}`,
+        '-p',
+        `${password}`,
+      ])
       .expect('stdout', /success/g)
       .expect('code', 0)
       .end();
@@ -286,7 +288,7 @@ describe('nrm delete without argument (use keyword to select delete)', () => {
     const { stdout } = fork(LOCAL_NRM, ['del']);
 
     const message = await new Promise((resolve) => {
-      stdout!.on('data', (data) => {
+      stdout?.on('data', (data) => {
         resolve(stripAnsi(data.toString()).trim());
       });
     });
@@ -302,11 +304,11 @@ describe('nrm delete without argument (use keyword to select delete)', () => {
 
   it('nrm delete (with keyword input)', async () => {
     const { stdout, stdin } = fork(LOCAL_NRM, ['del']);
-    stdin!.write('\u001b[B');
+    stdin?.write('\u001b[B');
 
     const message = await new Promise((resolve) => {
       const m: string[] = [];
-      stdout!.on('data', (data) => {
+      stdout?.on('data', (data) => {
         m.push(stripAnsi(data.toString()).trim());
         // get the last output
         if (m.length === 2) {
